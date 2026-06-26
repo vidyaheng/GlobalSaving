@@ -227,7 +227,30 @@
       }
     }
 
-    // ไม่ตั้ง annualPremium อัตโนมัติ เพราะควรกรอกจาก rate แผนจริง
+    updateAutoPremium();
+  }
+
+  function updateAutoPremium() {
+    const planId = getInputValue("plan-id");
+    const sumAssured = Number(getInputValue("sum-assured")) || 0;
+  
+    if (!planId || !sumAssured || typeof getPlan !== "function") return;
+  
+    const plan = getPlan(planId);
+    if (!plan) return;
+  
+    const rate = plan.basePremiumRate == null ? 1 : Number(plan.basePremiumRate);
+    const premium = Math.round(sumAssured * rate * 100) / 100;
+  
+    setInputValue("annual-premium", premium);
+  
+    if (window.GSCalc && typeof GSCalc.calculatePremiumDiscount === "function") {
+      const d = GSCalc.calculatePremiumDiscount(sumAssured, premium);
+  
+      setText("summary-sum-assured", money(sumAssured));
+      setText("summary-discount", `${percent(d.discountRate)} / ${money(d.discountAmount)}`);
+      setText("summary-premium-after", money(d.premiumAfterDiscount));
+    }
   }
 
   // =============================
@@ -491,28 +514,7 @@
     });
   }
 
-  function addLiveDiscountPreview() {
-    const sumInput = $("sum-assured");
-    const premiumInput = $("annual-premium");
-
-    if (!sumInput || !premiumInput) return;
-
-    const update = () => {
-      const sumAssured = Number(sumInput.value) || 0;
-      const premium = Number(premiumInput.value) || 0;
-
-      if (!sumAssured || !premium || !window.GSCalc) return;
-
-      const d = GSCalc.calculatePremiumDiscount(sumAssured, premium);
-
-      setText("summary-sum-assured", money(sumAssured));
-      setText("summary-discount", `${percent(d.discountRate)} / ${money(d.discountAmount)}`);
-      setText("summary-premium-after", money(d.premiumAfterDiscount));
-    };
-
-    sumInput.addEventListener("input", update);
-    premiumInput.addEventListener("input", update);
-  }
+  
 
   // =============================
   // Init
@@ -528,11 +530,12 @@
 
     $("btn-export-pdf")?.addEventListener("click", handleExportPdf);
     $("btn-export-excel")?.addEventListener("click", handleExportExcel);
+    $("sum-assured")?.addEventListener("input", updateAutoPremium);
 
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
 
     addAutoFormatNumber("sum-assured");
-    addAutoFormatNumber("annual-premium");
+    
     addLiveDiscountPreview();
   }
 
