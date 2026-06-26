@@ -47,6 +47,20 @@
   }
 
   // -----------------------------
+  // Base premium logic
+  // -----------------------------
+  
+  function calculateBaseAnnualPremium(plan, sumAssured) {
+    const amount = toNumber(sumAssured);
+    const rate =
+      plan.basePremiumRate == null
+        ? 1
+        : toNumber(plan.basePremiumRate, 1);
+  
+    return roundMoney(amount * rate);
+  }
+
+  // -----------------------------
   // Default product assumptions
   // -----------------------------
   // หมายเหตุ:
@@ -350,7 +364,7 @@
     const age = toNumber(input.age);
     const gender = input.gender || "male";
     const sumAssured = toNumber(input.sumAssured);
-    const annualPremiumBeforeDiscount = toNumber(input.annualPremium);
+    const annualPremiumBeforeDiscount = calculateBaseAnnualPremium(plan, sumAssured);
     const assumedIndexReturn = toNumber(input.assumedIndexReturn, 0);
     const taxRate = toNumber(input.taxRate, 0);
 
@@ -495,6 +509,7 @@
     calculatePremiumDiscount,
     buildYearlyTable,
     calculateProjectedIndexBenefit,
+    calculateBaseAnnualPremium,
 
     toSummaryRows,
     toYearlyTableRows,
