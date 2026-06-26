@@ -77,13 +77,13 @@ const PREMIUM_DISCOUNTS = [
   {
     minSumAssured: 500000,
     discountRate: 0.01,
-    label: "ทุนประกัน 500,000 บาทขึ้นไป ลดเบี้ย 1%"
+    label: "ทุนประกัน 500,000 บาทขึ้นไป ลด 1% ของทุนประกัน"
   },
   {
     minSumAssured: 100000,
     maxSumAssured: 499999,
     discountRate: 0.005,
-    label: "ทุนประกัน 100,000–499,999 บาท ลดเบี้ย 0.5%"
+    label: "ทุนประกัน 100,000–499,999 บาท ลด 0.5% ของทุนประกัน"
   }
 ];
 
