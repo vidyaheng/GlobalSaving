@@ -117,33 +117,35 @@
   function calculatePremiumDiscount(sumAssured, annualPremiumBeforeDiscount) {
     const amount = toNumber(sumAssured);
     const premium = toNumber(annualPremiumBeforeDiscount);
-
+  
     let discountRate = 0;
     let discountLabel = "ไม่มีส่วนลดเบี้ย";
-
+  
     if (typeof getPremiumDiscountRate === "function") {
       discountRate = getPremiumDiscountRate(amount);
     } else {
       if (amount >= 500000) discountRate = 0.01;
       else if (amount >= 100000) discountRate = 0.005;
     }
-
+  
     if (typeof getPremiumDiscountLabel === "function") {
       discountLabel = getPremiumDiscountLabel(amount);
     } else {
       if (discountRate === 0.01) {
-        discountLabel = "ทุนประกัน 500,000 บาทขึ้นไป ลดเบี้ย 1%";
+        discountLabel = "ทุนประกัน 500,000 บาทขึ้นไป ลด 1% ของทุนประกัน";
       } else if (discountRate === 0.005) {
-        discountLabel = "ทุนประกัน 100,000–499,999 บาท ลดเบี้ย 0.5%";
+        discountLabel = "ทุนประกัน 100,000–499,999 บาท ลด 0.5% ของทุนประกัน";
       }
     }
-
-    const discountAmount = roundMoney(premium * discountRate);
+  
+    // สำคัญ: ส่วนลดคิดจากทุนประกัน ไม่ใช่จากเบี้ย
+    const discountAmount = roundMoney(amount * discountRate);
     const premiumAfterDiscount = roundMoney(premium - discountAmount);
-
+  
     return {
       discountRate,
       discountLabel,
+      discountBase: amount,
       discountAmount,
       premiumBeforeDiscount: roundMoney(premium),
       premiumAfterDiscount
