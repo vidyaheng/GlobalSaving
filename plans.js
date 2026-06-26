@@ -13,6 +13,9 @@ const PLANS = {
     coverageYears: 15,
     premiumPayYears: 8,
 
+    basePremiumRate: 0.999,
+    basePremiumFormulaLabel: "เบี้ยก่อนส่วนลด = ทุนประกัน × 99.9%",
+
     minSumAssured: 100000,
     maxSumAssured: null,
 
@@ -43,6 +46,9 @@ const PLANS = {
 
     coverageYears: 25,
     premiumPayYears: 5,
+
+    basePremiumRate: 1.0,
+    basePremiumFormulaLabel: "เบี้ยก่อนส่วนลด = ทุนประกัน × 100%",
 
     minSumAssured: 100000,
     maxSumAssured: null,
