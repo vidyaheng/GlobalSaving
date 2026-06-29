@@ -442,34 +442,93 @@
 
         <section class="report-section">
           <h3>ตารางผลประโยชน์รายปี</h3>
-
-          <div class="table-wrap">
-            <table id="yearly-table">
-              <thead>
-                <tr>
-                  <th>ปี</th>
-                  <th>อายุ</th>
-                  <th>เบี้ยก่อนลด</th>
-                  <th>ส่วนลด</th>
-                  <th>เบี้ยหลังลด</th>
-                  <th>เบี้ยสะสม</th>
-                  <th>เงินจ่ายคืน</th>
-                  <th>ผลตอบแทนดัชนี</th>
-                  <th>ครบกำหนด</th>
-                  <th>รวมปีนี้</th>
-                </tr>
-              </thead>
-
-              <tbody id="yearly-table-body">
-                <tr>
-                  <td colspan="10" class="empty-table">
-                    กรุณากดคำนวณเพื่อแสดงตาราง
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+        
+            <div class="table-wrap">
+              <table id="yearly-table" class="benefit-table">
+                <thead>
+                  <tr>
+                    <th rowspan="2">ปี</th>
+                    <th rowspan="2">อายุ</th>
+          
+                    <th rowspan="2">
+                      เบี้ยหลังลด
+                      <button
+                        type="button"
+                        class="table-toggle-btn"
+                        data-toggle-column="tax"
+                        aria-label="แสดงหรือซ่อนประหยัดภาษี"
+                      >
+                        +
+                      </button>
+                    </th>
+          
+                    <th rowspan="2" class="col-tax">
+                      ประหยัดภาษี
+                    </th>
+          
+                    <th rowspan="2">
+                      เงินคืน / ครบกำหนด
+                      <button
+                        type="button"
+                        class="table-toggle-btn"
+                        data-toggle-column="cashback"
+                        aria-label="แสดงหรือซ่อนเงินคืนสะสม"
+                      >
+                        +
+                      </button>
+                    </th>
+          
+                    <th rowspan="2" class="col-cashback-cum">
+                      เงินคืนสะสม<br />
+                      0.5%
+                    </th>
+          
+                    <th id="th-surrender-group" colspan="3">
+                      กรณีเวนคืน
+                      <button
+                        type="button"
+                        class="table-toggle-btn"
+                        data-toggle-group="surrender"
+                        aria-label="ย่อหรือขยายคอลัมน์กรณีเวนคืน"
+                      >
+                        −
+                      </button>
+                    </th>
+          
+                    <th id="th-death-group" colspan="3">
+                      กรณีเสียชีวิต
+                      <button
+                        type="button"
+                        class="table-toggle-btn"
+                        data-toggle-group="death"
+                        aria-label="ย่อหรือขยายคอลัมน์กรณีเสียชีวิต"
+                      >
+                        −
+                      </button>
+                    </th>
+                  </tr>
+          
+                  <tr>
+                    <th class="col-surrender-detail">ผลตอบแทน<br />ดัชนี</th>
+                    <th class="col-surrender-detail">เงินค่า<br />เวนคืน</th>
+                    <th>ผลประโยชน์<br />รวม</th>
+          
+                    <th class="col-death-detail">ผลตอบแทน<br />ดัชนี</th>
+                    <th class="col-death-detail">ความคุ้มครอง<br />ชีวิต</th>
+                    <th>ผลประโยชน์<br />รวม</th>
+                  </tr>
+                </thead>
+          
+                <tbody id="yearly-table-body">
+                  <tr>
+                    <td colspan="12" class="empty-table">
+                      กรุณากดคำนวณเพื่อแสดงตาราง
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
 
         <section class="report-section disclaimer">
           <h3>หมายเหตุ</h3>
