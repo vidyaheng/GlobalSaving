@@ -158,42 +158,37 @@
 
   function validateQuoteInput(input) {
     const errors = [];
-
+  
     const planId = input.planId;
     const plan = getSafePlan(planId);
-
+  
     const age = toNumber(input.age);
     const sumAssured = toNumber(input.sumAssured);
-    const annualPremium = toNumber(input.annualPremium);
-
+  
     if (!planId) {
       errors.push("กรุณาเลือกแผน");
     }
-
+  
     if (!age || age <= 0) {
       errors.push("กรุณาระบุอายุให้ถูกต้อง");
     }
-
+  
     if (!sumAssured || sumAssured <= 0) {
       errors.push("กรุณาระบุทุนประกันให้ถูกต้อง");
     }
-
+  
     if (plan.minSumAssured && sumAssured < plan.minSumAssured) {
       errors.push(
         `ทุนประกันขั้นต่ำของแผนนี้คือ ${formatMoney(plan.minSumAssured)} บาท`
       );
     }
-
+  
     if (plan.maxSumAssured && sumAssured > plan.maxSumAssured) {
       errors.push(
         `ทุนประกันสูงสุดของแผนนี้คือ ${formatMoney(plan.maxSumAssured)} บาท`
       );
     }
-
-    if (!annualPremium || annualPremium <= 0) {
-      errors.push("กรุณาระบุเบี้ยประกันภัยต่อปีให้ถูกต้อง");
-    }
-
+  
     return {
       valid: errors.length === 0,
       errors
@@ -232,6 +227,24 @@
     return roundMoney(benefit);
   }
 
+  function getYearlyBenefitRate(plan, policyYear) {
+    if (!Array.isArray(plan.yearlyBenefitRates)) return null;
+  
+    return (
+      plan.yearlyBenefitRates.find((row) => {
+        return toNumber(row.year) === toNumber(policyYear);
+      }) || null
+    );
+  }
+  
+  function scaleBenefitFromRate(plan, per1000Value, sumAssured) {
+    const base = toNumber(plan.benefitRateBase, 1000) || 1000;
+    const amount = toNumber(sumAssured);
+    const rate = toNumber(per1000Value);
+  
+    return roundMoney((rate * amount) / base);
+  }
+
   // -----------------------------
   // Yearly table
   // -----------------------------
@@ -246,61 +259,97 @@
     assumedIndexReturn
   }) {
     const assumptions = getDefaultPlanAssumptions(plan.id);
-
+  
     const coverageYears = toNumber(plan.coverageYears);
     const premiumPayYears = toNumber(plan.premiumPayYears);
-
-    const annualCashbackRate =
-      plan.annualCashbackRate ?? assumptions.annualCashbackRate;
-
-    const guaranteedMaturityRate =
-      plan.guaranteedMaturityRate ?? assumptions.guaranteedMaturityRate;
-
+  
     const indexPayoutRates =
       plan.indexPayoutRates ?? assumptions.indexPayoutRates;
-
+  
     const indexParticipationRate =
       plan.indexParticipationRate ?? assumptions.indexParticipationRate;
-
+  
     const rows = [];
-
+  
     let cumulativePremiumBeforeDiscount = 0;
     let cumulativeDiscount = 0;
     let cumulativePremiumAfterDiscount = 0;
+  
+    // หมายถึงผลประโยชน์กรณีมีชีวิตอยู่แบบรับเงินจ่ายคืน
+    // รวมเงินคืนรายปี + เงินครบกำหนดในปีสุดท้าย
     let cumulativeCashback = 0;
+  
     let cumulativeIndexBenefit = 0;
-
+  
     for (let year = 1; year <= coverageYears; year++) {
       const isPremiumPayYear = year <= premiumPayYears;
       const isMaturityYear = year === coverageYears;
-
+  
+      const benefitRateRow = getYearlyBenefitRate(plan, year);
+  
       const premiumBeforeDiscount = isPremiumPayYear
         ? roundMoney(annualPremiumBeforeDiscount)
         : 0;
-
+  
       const discountAmount = isPremiumPayYear
         ? roundMoney(discountAmountPerYear)
         : 0;
-
+  
       const premiumAfterDiscount = isPremiumPayYear
         ? roundMoney(annualPremiumAfterDiscount)
         : 0;
-
+  
       cumulativePremiumBeforeDiscount = roundMoney(
         cumulativePremiumBeforeDiscount + premiumBeforeDiscount
       );
-
+  
       cumulativeDiscount = roundMoney(cumulativeDiscount + discountAmount);
-
+  
       cumulativePremiumAfterDiscount = roundMoney(
         cumulativePremiumAfterDiscount + premiumAfterDiscount
       );
-
-      const annualCashback = roundMoney(sumAssured * annualCashbackRate);
-      cumulativeCashback = roundMoney(cumulativeCashback + annualCashback);
-
+  
+      // -----------------------------
+      // Guaranteed benefit from PDF rates
+      // -----------------------------
+  
+      const livingBenefit = benefitRateRow
+        ? scaleBenefitFromRate(plan, benefitRateRow.livingBenefit, sumAssured)
+        : 0;
+  
+      const accumulatedLivingBenefit = benefitRateRow
+        ? scaleBenefitFromRate(
+            plan,
+            benefitRateRow.accumulatedLivingBenefit,
+            sumAssured
+          )
+        : 0;
+  
+      const deathGuaranteed = benefitRateRow
+        ? scaleBenefitFromRate(plan, benefitRateRow.deathGuaranteed, sumAssured)
+        : 0;
+  
+      const surrenderGuaranteed = benefitRateRow
+        ? scaleBenefitFromRate(
+            plan,
+            benefitRateRow.surrenderGuaranteed,
+            sumAssured
+          )
+        : 0;
+  
+      // ปีสุดท้าย livingBenefit คือเงินครบกำหนด/ผลประโยชน์ปลายสัญญา
+      // ปีอื่น ๆ คือเงินจ่ายคืนรายปี
+      const annualCashback = isMaturityYear ? 0 : livingBenefit;
+      const guaranteedMaturityBenefit = isMaturityYear ? livingBenefit : 0;
+  
+      cumulativeCashback = roundMoney(cumulativeCashback + livingBenefit);
+  
+      // -----------------------------
+      // Index-linked projection
+      // -----------------------------
+  
       const indexPayoutRate = indexPayoutRates[year] || 0;
-
+  
       const projectedIndexBenefit = calculateProjectedIndexBenefit({
         policyYear: year,
         cumulativePremiumAfterDiscount,
@@ -308,43 +357,59 @@
         payoutRate: indexPayoutRate,
         participationRate: indexParticipationRate
       });
-
+  
       cumulativeIndexBenefit = roundMoney(
         cumulativeIndexBenefit + projectedIndexBenefit
       );
-
-      const guaranteedMaturityBenefit = isMaturityYear
-        ? roundMoney(sumAssured * guaranteedMaturityRate)
-        : 0;
-
-      const totalBenefitThisYear = roundMoney(
-        annualCashback + projectedIndexBenefit + guaranteedMaturityBenefit
+  
+      // ตอนนี้ยังให้ death/surrender index benefit เป็น 0 ก่อน
+      // รอบถัดไปค่อยแยก logic ตาม rate กรณีเสียชีวิต / เวนคืน
+      const deathIndexBenefit = 0;
+      const surrenderIndexBenefit = 0;
+  
+      const deathTotal = roundMoney(deathGuaranteed + deathIndexBenefit);
+      const surrenderTotal = roundMoney(
+        surrenderGuaranteed + surrenderIndexBenefit
       );
-
+  
+      const totalBenefitThisYear = roundMoney(
+        livingBenefit + projectedIndexBenefit
+      );
+  
       rows.push({
         policyYear: year,
         age: toNumber(age) + year - 1,
-
+  
         premiumBeforeDiscount,
         discountAmount,
         premiumAfterDiscount,
-
+  
         cumulativePremiumBeforeDiscount,
         cumulativeDiscount,
         cumulativePremiumAfterDiscount,
-
+  
+        // compatible กับ app.js เดิม
         annualCashback,
         cumulativeCashback,
-
-        indexPayoutRate,
         projectedIndexBenefit,
         cumulativeIndexBenefit,
-
         guaranteedMaturityBenefit,
-        totalBenefitThisYear
+        totalBenefitThisYear,
+  
+        // fields ใหม่สำหรับตารางแบบ + / −
+        livingBenefit,
+        accumulatedLivingBenefit,
+  
+        deathGuaranteed,
+        deathIndexBenefit,
+        deathTotal,
+  
+        surrenderGuaranteed,
+        surrenderIndexBenefit,
+        surrenderTotal
       });
     }
-
+  
     return rows;
   }
 
@@ -429,13 +494,12 @@
       taxRate,
 
       totalCashback: finalRow.cumulativeCashback,
+      accumulatedLivingBenefit: finalRow.accumulatedLivingBenefit,
       totalProjectedIndexBenefit: finalRow.cumulativeIndexBenefit,
       guaranteedMaturityBenefit: finalRow.guaranteedMaturityBenefit,
 
       projectedTotalBenefit: roundMoney(
-        finalRow.cumulativeCashback +
-          finalRow.cumulativeIndexBenefit +
-          finalRow.guaranteedMaturityBenefit
+        finalRow.cumulativeCashback + finalRow.cumulativeIndexBenefit
       )
     };
 
