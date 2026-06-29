@@ -82,6 +82,31 @@
     return `${(n * 100).toFixed(2)}%`;
   }
 
+  function tableMoney(value) {
+    const n = Number(value) || 0;
+  
+    return n.toLocaleString("th-TH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+  
+  function tableCell(value, className = "") {
+    const n = Number(value) || 0;
+    const classes = [className, n === 0 ? "zero-cell" : ""]
+      .filter(Boolean)
+      .join(" ");
+  
+    return `<td${classes ? ` class="${classes}"` : ""}>${tableMoney(n)}</td>`;
+  }
+  
+  function calculateTaxSaving(row, quote) {
+    const taxRate = Number(quote?.summary?.taxRate) || 0;
+    const premium = Number(row.premiumAfterDiscount) || 0;
+  
+    return Math.round(((premium * taxRate) / 100 + Number.EPSILON) * 100) / 100;
+  }
+
   function thaiGender(value) {
     if (value === "female") return "หญิง";
     if (value === "male") return "ชาย";
@@ -417,26 +442,77 @@
   function renderYearlyTable(quote) {
     const tbody = $("yearly-table-body");
     if (!tbody) return;
-
+  
     tbody.innerHTML = "";
-
+  
     quote.yearlyTable.forEach((row) => {
       const tr = document.createElement("tr");
-
+  
+      const taxSaving = calculateTaxSaving(row, quote);
+  
       tr.innerHTML = `
         <td>${row.policyYear}</td>
         <td>${row.age}</td>
-        <td>${money(row.premiumBeforeDiscount)}</td>
-        <td>${money(row.discountAmount)}</td>
-        <td>${money(row.premiumAfterDiscount)}</td>
-        <td>${money(row.cumulativePremiumAfterDiscount)}</td>
-        <td>${money(row.annualCashback)}</td>
-        <td>${money(row.projectedIndexBenefit)}</td>
-        <td>${money(row.guaranteedMaturityBenefit)}</td>
-        <td>${money(row.totalBenefitThisYear)}</td>
+  
+        ${tableCell(row.premiumAfterDiscount)}
+        ${tableCell(taxSaving, "col-tax")}
+  
+        ${tableCell(row.livingBenefit)}
+        ${tableCell(row.accumulatedLivingBenefit, "col-cashback-cum")}
+  
+        ${tableCell(row.surrenderIndexBenefit, "col-surrender-detail")}
+        ${tableCell(row.surrenderGuaranteed, "col-surrender-detail")}
+        ${tableCell(row.surrenderTotal, "total-cell")}
+  
+        ${tableCell(row.deathIndexBenefit, "col-death-detail")}
+        ${tableCell(row.deathGuaranteed, "col-death-detail")}
+        ${tableCell(row.deathTotal, "total-cell")}
       `;
-
+  
       tbody.appendChild(tr);
+    });
+  }
+
+  function setupBenefitTableToggles() {
+    const table = $("yearly-table");
+    if (!table) return;
+  
+    document.querySelectorAll("[data-toggle-column]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.toggleColumn;
+  
+        if (target === "tax") {
+          const shown = table.classList.toggle("show-tax");
+          button.textContent = shown ? "−" : "+";
+        }
+  
+        if (target === "cashback") {
+          const shown = table.classList.toggle("show-cashback");
+          button.textContent = shown ? "−" : "+";
+        }
+      });
+    });
+  
+    document.querySelectorAll("[data-toggle-group]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.toggleGroup;
+  
+        if (target === "surrender") {
+          const collapsed = table.classList.toggle("collapse-surrender");
+          button.textContent = collapsed ? "+" : "−";
+  
+          const th = $("th-surrender-group");
+          if (th) th.colSpan = collapsed ? 1 : 3;
+        }
+  
+        if (target === "death") {
+          const collapsed = table.classList.toggle("collapse-death");
+          button.textContent = collapsed ? "+" : "−";
+  
+          const th = $("th-death-group");
+          if (th) th.colSpan = collapsed ? 1 : 3;
+        }
+      });
     });
   }
 
@@ -471,7 +547,7 @@
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="10" class="empty-table">
+          <td colspan="12" class="empty-table">
             กรุณากดคำนวณเพื่อแสดงตาราง
           </td>
         </tr>
@@ -567,6 +643,8 @@
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
   
     addAutoFormatNumber("sum-assured");
+
+    setupBenefitTableToggles();
   
     bindTabEvents();
   }
