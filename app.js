@@ -253,6 +253,36 @@
     }
   }
 
+  function activateTab(tabName) {
+    document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+      const isActive = panel.dataset.tabPanel === tabName;
+      panel.hidden = !isActive;
+      panel.classList.toggle("active", isActive);
+    });
+  
+    document.querySelectorAll("[data-tab]").forEach((button) => {
+      const isActive = button.dataset.tab === tabName;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+  }
+  
+  function setTabEnabled(tabName, enabled) {
+    const button = document.querySelector(`[data-tab="${tabName}"]`);
+    if (button) {
+      button.disabled = !enabled;
+    }
+  }
+  
+  function bindTabEvents() {
+    document.querySelectorAll("[data-tab]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.disabled) return;
+        activateTab(button.dataset.tab);
+      });
+    });
+  }
+
   // =============================
   // Form
   // =============================
@@ -315,18 +345,16 @@
 
     showFormErrors([]);
     renderQuote(quote);
+    
+    setTabEnabled("table", true);
     show($("result-section"));
-
+    activateTab("table");
+    
     writeLog("calculate_quote", {
       planId: quote.summary.planId,
       sumAssured: quote.summary.sumAssured,
       annualPremiumAfterDiscount: quote.summary.annualPremiumAfterDiscount,
       at: new Date().toISOString()
-    });
-
-    $("result-section")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
     });
   }
 
@@ -428,6 +456,10 @@
 
     hide($("result-section"));
 
+    setTabEnabled("table", false);
+    setTabEnabled("chart", false);
+    activateTab("input");
+
     setText("summary-plan", "-");
     setText("summary-sum-assured", "-");
     setText("summary-discount", "-");
@@ -523,20 +555,20 @@
   function bindEvents() {
     $("pin-form")?.addEventListener("submit", handlePinSubmit);
     $("btn-logout")?.addEventListener("click", handleLogout);
-
+  
     $("quote-form")?.addEventListener("submit", handleQuoteSubmit);
-
+  
     $("btn-clear")?.addEventListener("click", clearForm);
-
+  
     $("btn-export-pdf")?.addEventListener("click", handleExportPdf);
     $("btn-export-excel")?.addEventListener("click", handleExportExcel);
+  
     $("sum-assured")?.addEventListener("input", updateAutoPremium);
-
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
-
+  
     addAutoFormatNumber("sum-assured");
-    
-    addLiveDiscountPreview();
+  
+    bindTabEvents();
   }
 
   function init() {
@@ -544,6 +576,10 @@
     applyPlanDefaults();
     bindEvents();
     renderAuthState();
+
+    activateTab("input");
+    setTabEnabled("table", false);
+    setTabEnabled("chart", false);
 
     writeLog("app_loaded", {
       at: new Date().toISOString()
