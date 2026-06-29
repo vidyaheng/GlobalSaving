@@ -695,6 +695,88 @@ tbody tr:last-child td {
 }
 
 /* =========================
+   Benefit Table Toggles
+========================= */
+
+.benefit-table {
+  min-width: 1280px;
+}
+
+.benefit-table th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.benefit-table td {
+  vertical-align: middle;
+}
+
+.table-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.table-toggle-btn:hover {
+  background: var(--primary-dark);
+}
+
+.table-toggle-btn:focus-visible {
+  outline: 3px solid rgba(15, 94, 168, 0.22);
+  outline-offset: 2px;
+}
+
+/* default: ซ่อน column เสริม */
+.benefit-table .col-tax,
+.benefit-table .col-cashback-cum {
+  display: none;
+}
+
+/* กด + แล้วแสดง */
+.benefit-table.show-tax .col-tax {
+  display: table-cell;
+}
+
+.benefit-table.show-cashback .col-cashback-cum {
+  display: table-cell;
+}
+
+/* default: แสดงรายละเอียดเวนคืน / เสียชีวิตครบ */
+.benefit-table.collapse-surrender .col-surrender-detail {
+  display: none;
+}
+
+.benefit-table.collapse-death .col-death-detail {
+  display: none;
+}
+
+.benefit-table .total-cell {
+  font-weight: 900;
+  color: var(--primary-dark);
+  background: #f8fafc;
+}
+
+.benefit-table .zero-cell {
+  color: #94a3b8;
+}
+
+.benefit-table tbody tr:hover .total-cell {
+  background: #eef6ff;
+}
+
+/* =========================
    Disclaimer
 ========================= */
 
@@ -793,6 +875,10 @@ tbody tr:last-child td {
   table {
     min-width: 980px;
   }
+  
+  .benefit-table {
+    min-width: 1180px;
+  }
 }
 
 /* =========================
@@ -888,6 +974,10 @@ tbody tr:last-child td {
   th {
     position: static;
     background: #f3f4f6 !important;
+  }
+
+  .table-toggle-btn {
+    display: none !important;
   }
 
   tr {
