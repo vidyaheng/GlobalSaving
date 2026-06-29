@@ -74,187 +74,228 @@
       </div>
     </header>
 
+    <nav class="app-tabs" aria-label="ส่วนการทำงาน">
+      <button
+        id="tab-input-btn"
+        type="button"
+        class="tab-btn active"
+        data-tab="input"
+        aria-selected="true"
+      >
+        1. กรอกข้อมูล
+      </button>
+    
+      <button
+        id="tab-table-btn"
+        type="button"
+        class="tab-btn"
+        data-tab="table"
+        aria-selected="false"
+        disabled
+      >
+        2. ตารางผลประโยชน์
+      </button>
+    
+      <button
+        id="tab-chart-btn"
+        type="button"
+        class="tab-btn"
+        data-tab="chart"
+        aria-selected="false"
+        disabled
+      >
+        3. กราฟ
+      </button>
+    </nav>
 
-    <!-- =========================
-         MAIN LAYOUT
-    ========================== -->
-    <main class="main-layout">
+    <section id="tab-input" class="tab-panel active" data-tab-panel="input">
       <!-- =========================
-           INPUT PANEL
+           MAIN LAYOUT
       ========================== -->
-      <section class="panel input-panel">
-        <div class="panel-header">
-          <div>
-            <h2>ข้อมูลสำหรับคำนวณ</h2>
-            <p class="muted">
-              เลือกแผนและกรอกข้อมูลเบื้องต้น
-            </p>
-          </div>
-        </div>
-
-        <form id="quote-form" class="quote-form">
-          <div class="form-grid">
-            <div class="field field-full">
-              <label for="plan-id">แผน</label>
-              <select id="plan-id" name="planId" required>
-                <option value="GS_15_8">Global Saving 15/8</option>
-                <option value="GS_25_5">Global Saving 25/5</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="gender">เพศ</label>
-              <select id="gender" name="gender">
-                <option value="male">ชาย</option>
-                <option value="female">หญิง</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="age">อายุ</label>
-              <input
-                id="age"
-                name="age"
-                type="number"
-                min="1"
-                max="99"
-                value="30"
-                required
-              />
-            </div>
-
-            <div class="field">
-              <label for="sum-assured">ทุนประกันภัย</label>
-              <input
-                id="sum-assured"
-                name="sumAssured"
-                type="number"
-                min="100000"
-                step="1000"
-                value="100000"
-                required
-              />
-              <small>100,000–499,999 ลด 0.5% / 500,000 ขึ้นไป ลด 1%</small>
-            </div>
-
-            <div class="field">
-              <label for="annual-premium">เบี้ยประกันภัยต่อปี ก่อนส่วนลด</label>
-              <input
-                id="annual-premium"
-                name="annualPremium"
-                type="number"
-                min="1"
-                step="1"
-                placeholder="คำนวณอัตโนมัติ"
-                readonly
-              />
-              <small>ระบบคำนวณจากทุนประกันตามแผน ก่อนหักส่วนลด</small>
-            </div>
-
-            <div class="field">
-              <label for="assumed-index-return">ผลตอบแทนดัชนีสมมติเฉลี่ยต่อปี (%)</label>
-              <input
-                id="assumed-index-return"
-                name="assumedIndexReturn"
-                type="number"
-                step="0.1"
-                value="0"
-              />
-            </div>
-
-            <div class="field">
-              <label for="tax-rate">ฐานภาษี (%)</label>
-              <input
-                id="tax-rate"
-                name="taxRate"
-                type="number"
-                step="0.1"
-                value="0"
-              />
-            </div>
-
-            <div class="field">
-              <label for="customer-name">ชื่อลูกค้า</label>
-              <input
-                id="customer-name"
-                name="customerName"
-                type="text"
-                placeholder="ไม่บังคับ"
-              />
-            </div>
-
-            <div class="field">
-              <label for="advisor-name">ชื่อผู้เสนอ</label>
-              <input
-                id="advisor-name"
-                name="advisorName"
-                type="text"
-                placeholder="ไม่บังคับ"
-              />
+      <main class="main-layout">
+        <!-- =========================
+             INPUT PANEL
+        ========================== -->
+        <section class="panel input-panel">
+          <div class="panel-header">
+            <div>
+              <h2>ข้อมูลสำหรับคำนวณ</h2>
+              <p class="muted">
+                เลือกแผนและกรอกข้อมูลเบื้องต้น
+              </p>
             </div>
           </div>
-
-          <div id="form-errors" class="form-errors" hidden></div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary btn-large">
-              คำนวณ
-            </button>
+  
+          <form id="quote-form" class="quote-form">
+            <div class="form-grid">
+              <div class="field field-full">
+                <label for="plan-id">แผน</label>
+                <select id="plan-id" name="planId" required>
+                  <option value="GS_15_8">Global Saving 15/8</option>
+                  <option value="GS_25_5">Global Saving 25/5</option>
+                </select>
+              </div>
+  
+              <div class="field">
+                <label for="gender">เพศ</label>
+                <select id="gender" name="gender">
+                  <option value="male">ชาย</option>
+                  <option value="female">หญิง</option>
+                </select>
+              </div>
+  
+              <div class="field">
+                <label for="age">อายุ</label>
+                <input
+                  id="age"
+                  name="age"
+                  type="number"
+                  min="1"
+                  max="99"
+                  value="30"
+                  required
+                />
+              </div>
+  
+              <div class="field">
+                <label for="sum-assured">ทุนประกันภัย</label>
+                <input
+                  id="sum-assured"
+                  name="sumAssured"
+                  type="number"
+                  min="100000"
+                  step="1000"
+                  value="100000"
+                  required
+                />
+                <small>100,000–499,999 ลด 0.5% / 500,000 ขึ้นไป ลด 1%</small>
+              </div>
+  
+              <div class="field">
+                <label for="annual-premium">เบี้ยประกันภัยต่อปี ก่อนส่วนลด</label>
+                <input
+                  id="annual-premium"
+                  name="annualPremium"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="คำนวณอัตโนมัติ"
+                  readonly
+                />
+                <small>ระบบคำนวณจากทุนประกันตามแผน ก่อนหักส่วนลด</small>
+              </div>
+  
+              <div class="field">
+                <label for="assumed-index-return">ผลตอบแทนดัชนีสมมติเฉลี่ยต่อปี (%)</label>
+                <input
+                  id="assumed-index-return"
+                  name="assumedIndexReturn"
+                  type="number"
+                  step="0.1"
+                  value="0"
+                />
+              </div>
+  
+              <div class="field">
+                <label for="tax-rate">ฐานภาษี (%)</label>
+                <input
+                  id="tax-rate"
+                  name="taxRate"
+                  type="number"
+                  step="0.1"
+                  value="0"
+                />
+              </div>
+  
+              <div class="field">
+                <label for="customer-name">ชื่อลูกค้า</label>
+                <input
+                  id="customer-name"
+                  name="customerName"
+                  type="text"
+                  placeholder="ไม่บังคับ"
+                />
+              </div>
+  
+              <div class="field">
+                <label for="advisor-name">ชื่อผู้เสนอ</label>
+                <input
+                  id="advisor-name"
+                  name="advisorName"
+                  type="text"
+                  placeholder="ไม่บังคับ"
+                />
+              </div>
+            </div>
+  
+            <div id="form-errors" class="form-errors" hidden></div>
+  
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-large">
+                คำนวณ
+              </button>
+            </div>
+          </form>
+        </section>
+  
+  
+        <!-- =========================
+             LIVE SUMMARY PANEL
+        ========================== -->
+        <aside class="panel summary-panel">
+          <div class="panel-header">
+            <div>
+              <h2>สรุปเบื้องต้น</h2>
+              <p class="muted">แสดงหลังจากกดคำนวณ</p>
+            </div>
           </div>
-        </form>
-      </section>
-
-
-      <!-- =========================
-           LIVE SUMMARY PANEL
-      ========================== -->
-      <aside class="panel summary-panel">
-        <div class="panel-header">
-          <div>
-            <h2>สรุปเบื้องต้น</h2>
-            <p class="muted">แสดงหลังจากกดคำนวณ</p>
+  
+          <div class="summary-cards">
+            <div class="summary-card">
+              <span>แผน</span>
+              <strong id="summary-plan">-</strong>
+            </div>
+  
+            <div class="summary-card">
+              <span>ทุนประกัน</span>
+              <strong id="summary-sum-assured">-</strong>
+            </div>
+  
+            <div class="summary-card">
+              <span>ส่วนลด</span>
+              <strong id="summary-discount">-</strong>
+            </div>
+  
+            <div class="summary-card highlight">
+              <span>เบี้ยหลังส่วนลด / ปี</span>
+              <strong id="summary-premium-after">-</strong>
+            </div>
+  
+            <div class="summary-card">
+              <span>เบี้ยรวมหลังส่วนลด</span>
+              <strong id="summary-total-premium">-</strong>
+            </div>
+  
+            <div class="summary-card">
+              <span>ผลประโยชน์รวมประมาณการ</span>
+              <strong id="summary-total-benefit">-</strong>
+            </div>
           </div>
-        </div>
+        </aside>
+      </main>
 
-        <div class="summary-cards">
-          <div class="summary-card">
-            <span>แผน</span>
-            <strong id="summary-plan">-</strong>
-          </div>
-
-          <div class="summary-card">
-            <span>ทุนประกัน</span>
-            <strong id="summary-sum-assured">-</strong>
-          </div>
-
-          <div class="summary-card">
-            <span>ส่วนลด</span>
-            <strong id="summary-discount">-</strong>
-          </div>
-
-          <div class="summary-card highlight">
-            <span>เบี้ยหลังส่วนลด / ปี</span>
-            <strong id="summary-premium-after">-</strong>
-          </div>
-
-          <div class="summary-card">
-            <span>เบี้ยรวมหลังส่วนลด</span>
-            <strong id="summary-total-premium">-</strong>
-          </div>
-
-          <div class="summary-card">
-            <span>ผลประโยชน์รวมประมาณการ</span>
-            <strong id="summary-total-benefit">-</strong>
-          </div>
-        </div>
-      </aside>
-    </main>
+    </section>
 
 
     <!-- =========================
          RESULT AREA
     ========================== -->
-    <section id="result-section" class="result-section" hidden>
+    <section
+      id="result-section"
+      class="tab-panel result-section"
+      data-tab-panel="table"
+      hidden
+    >
       <div class="result-toolbar">
         <div>
           <p class="eyebrow">Result</p>
@@ -439,6 +480,28 @@
           </p>
         </section>
       </article>
+    </section>
+    <section
+      id="tab-chart"
+      class="tab-panel result-section"
+      data-tab-panel="chart"
+      hidden
+    >
+      <div class="result-toolbar">
+        <div>
+          <p class="eyebrow">Chart</p>
+          <h2>กราฟผลประโยชน์</h2>
+          <p class="muted">ส่วนนี้เตรียมไว้สำหรับพัฒนากราฟในขั้นต่อไป</p>
+        </div>
+      </div>
+    
+      <div class="empty-state">
+        <h3>ยังไม่ได้เปิดใช้งานกราฟ</h3>
+        <p>
+          ตอนนี้ให้ใช้งาน Tab ตารางผลประโยชน์ก่อน
+          หลังจากตารางนิ่งแล้วค่อยเพิ่มกราฟจากข้อมูลเดียวกัน
+        </p>
+      </div>
     </section>
   </div>
 
