@@ -42,7 +42,7 @@ const PLANS = {
       { year: 15, livingBenefit: 8010.0000, accumulatedLivingBenefit: 8155.3655, deathGuaranteed: 8350.0000, deathTotal: 8350.0000, surrenderGuaranteed: 8010.0000, surrenderTotal: 8010.0000 }
     ],
 
-    minSumAssured: 100000,
+    minSumAssured: 20000,
     maxSumAssured: null,
 
     currency: "THB",
@@ -108,7 +108,7 @@ const PLANS = {
       { year: 25, livingBenefit: 5010.0000, accumulatedLivingBenefit: 5265.5910, deathGuaranteed: 5350.0000, deathTotal: 5350.0000, surrenderGuaranteed: 5010.0000, surrenderTotal: 5010.0000 }
     ],
 
-    minSumAssured: 100000,
+    minSumAssured: 20000,
     maxSumAssured: null,
 
     currency: "THB",
