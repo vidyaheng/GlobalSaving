@@ -391,6 +391,7 @@
         // compatible กับ app.js เดิม
         annualCashback,
         cumulativeCashback,
+        indexPayoutRate,
         projectedIndexBenefit,
         cumulativeIndexBenefit,
         guaranteedMaturityBenefit,
