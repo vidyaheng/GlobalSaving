@@ -771,7 +771,7 @@
     
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
   
-    addAutoFormatNumber("sum-assured");
+    // addAutoFormatNumber("sum-assured"); ปิดการแสดงค่าเป็นจำนวนเต็มไว้ก่อน ต้องการแสดงเป็น ทศนิยม
 
     setupBenefitTableToggles();
   
