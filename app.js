@@ -344,36 +344,46 @@
 
   function applyPlanDefaults() {
     const planId = getInputValue("plan-id");
-
+  
     if (typeof getPlan !== "function") return;
-
+  
     const plan = getPlan(planId);
     if (!plan) return;
-
+  
     localStorage.setItem(LAST_PLAN_KEY, planId);
-
+  
     if (plan.defaultInput) {
       if (plan.defaultInput.gender) {
         setInputValue("gender", plan.defaultInput.gender);
       }
-
+  
       if (plan.defaultInput.age) {
         setInputValue("age", plan.defaultInput.age);
       }
-
-      if (plan.defaultInput.sumAssured) {
-        setInputValue("sum-assured", plan.defaultInput.sumAssured);
-      }
-
+  
       if (plan.defaultInput.assumedIndexReturn != null) {
         setInputValue("assumed-index-return", plan.defaultInput.assumedIndexReturn);
       }
-
+  
       if (plan.defaultInput.taxRate != null) {
         setInputValue("tax-rate", plan.defaultInput.taxRate);
       }
+  
+      // สำคัญ:
+      // ถ้ามี default annualPremium ให้ถือว่าเป็น "เบี้ยหลังส่วนลดที่ลูกค้าจ่ายจริง"
+      // แล้วคำนวณทุนย้อนกลับ
+      if (plan.defaultInput.annualPremium) {
+        setInputValue("annual-premium", plan.defaultInput.annualPremium);
+        updateSumAssuredFromPremium();
+        return;
+      }
+  
+      // fallback ถ้าไม่มี annualPremium ค่อยใช้ทุนเป็นตัวตั้ง
+      if (plan.defaultInput.sumAssured) {
+        setInputValue("sum-assured", plan.defaultInput.sumAssured);
+      }
     }
-
+  
     updateAutoPremium();
   }
 
