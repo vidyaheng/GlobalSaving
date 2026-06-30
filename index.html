@@ -163,9 +163,9 @@
                   id="sum-assured"
                   name="sumAssured"
                   type="number"
-                  min="100000"
+                  min="20000"
                   step="1000"
-                  value="100000"
+                  value="20000"
                   required
                 />
                 <small>100,000–499,999 ลด 0.5% / 500,000 ขึ้นไป ลด 1%</small>
@@ -177,12 +177,12 @@
                   id="annual-premium"
                   name="annualPremium"
                   type="number"
-                  min="1"
-                  step="1"
-                  placeholder="คำนวณอัตโนมัติ"
-                  readonly
+                  min="0"
+                  step="0.01"
+                  placeholder="20000"
+                  required
                 />
-                <small>ระบบคำนวณจากทุนประกันตามแผน ก่อนหักส่วนลด</small>
+                <small>กรอกทุนหรือกรอกเบี้ยก็ได้ ระบบจะปรับอีกช่องให้อัตโนมัติ</small>
               </div>
   
               <div class="field">
