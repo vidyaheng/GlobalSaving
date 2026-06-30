@@ -887,7 +887,7 @@ tbody tr:last-child td {
 .report-grid strong,
 .report-meta strong {
   color: #0f3f7a;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 /* =========================
@@ -898,14 +898,14 @@ tbody tr:last-child td {
 .field select,
 .field textarea {
   color: #0f3f7a;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* placeholder ยังให้สีอ่อน ไม่แย่งกับค่าจริง */
 .field input::placeholder,
 .field textarea::placeholder {
   color: #94a3b8;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* ตอน focus ให้ยังเป็นน้ำเงินเข้ม */
@@ -913,7 +913,7 @@ tbody tr:last-child td {
 .field select:focus,
 .field textarea:focus {
   color: #0f3f7a;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* =========================
