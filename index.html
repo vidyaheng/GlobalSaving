@@ -466,7 +466,20 @@
                     <th rowspan="2">
                       ผลตอบแทน<br />
                       ดัชนี
-                    </th> 
+                      <button
+                        type="button"
+                        class="table-toggle-btn"
+                        data-toggle-column="index-cum"
+                        aria-label="แสดงหรือซ่อนดัชนีสะสม/รับแล้ว"
+                      >
+                        +
+                      </button>
+                    </th>
+                    
+                    <th rowspan="2" class="col-index-cum">
+                      ดัชนี<br />
+                      สะสม/รับแล้ว
+                    </th>
           
                     <th id="th-surrender-group" colspan="1">
                       กรณีเวนคืน
@@ -505,7 +518,7 @@
           
                 <tbody id="yearly-table-body">
                   <tr>
-                    <td colspan="13" class="empty-table">
+                    <td colspan="14" class="empty-table">
                       กรุณากดคำนวณเพื่อแสดงตาราง
                     </td>
                   </tr>
