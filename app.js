@@ -459,13 +459,12 @@
   
         ${tableCell(row.livingBenefit)}
         ${tableCell(row.projectedIndexBenefit)}
-        ${tableCell(row.totalBenefitThisYear, "total-cell")}
         ${tableCell(row.accumulatedLivingBenefit, "col-cashback-cum")}
   
         ${tableCell(row.surrenderIndexBenefit, "col-surrender-detail")}
         ${tableCell(row.surrenderGuaranteed, "col-surrender-detail")}
         ${tableCell(row.surrenderTotal, "total-cell")}
-  
+        
         ${tableCell(row.deathIndexBenefit, "col-death-detail")}
         ${tableCell(row.deathGuaranteed, "col-death-detail")}
         ${tableCell(row.deathTotal, "total-cell")}
@@ -549,7 +548,7 @@
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="14" class="empty-table">
+          <td colspan="13" class="empty-table">
             กรุณากดคำนวณเพื่อแสดงตาราง
           </td>
         </tr>
