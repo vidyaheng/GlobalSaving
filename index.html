@@ -415,14 +415,14 @@
           <h3>ตารางผลประโยชน์รายปี</h3>
         
             <div class="table-wrap">
-              <table id="yearly-table" class="benefit-table">
+              <table id="yearly-table" class="benefit-table compact-benefit-table collapse-surrender collapse-death">
                 <thead>
                   <tr>
                     <th rowspan="2">ปี</th>
                     <th rowspan="2">อายุ</th>
           
                     <th rowspan="2">
-                      เบี้ยหลังลด
+                      เบี้ยประกัน
                       <button
                         type="button"
                         class="table-toggle-btn"
@@ -438,7 +438,7 @@
                     </th>
           
                     <th rowspan="2">
-                      เงินคืน / ครบกำหนด
+                      เงินคืน
                       <button
                         type="button"
                         class="table-toggle-btn"
@@ -459,7 +459,7 @@
                       0.5%
                     </th>
           
-                    <th id="th-surrender-group" colspan="3">
+                    <th id="th-surrender-group" colspan="1">
                       กรณีเวนคืน
                       <button
                         type="button"
@@ -467,11 +467,11 @@
                         data-toggle-group="surrender"
                         aria-label="ย่อหรือขยายคอลัมน์กรณีเวนคืน"
                       >
-                        −
+                        +
                       </button>
                     </th>
           
-                    <th id="th-death-group" colspan="3">
+                    <th id="th-death-group" colspan="1">
                       กรณีเสียชีวิต
                       <button
                         type="button"
@@ -479,10 +479,9 @@
                         data-toggle-group="death"
                         aria-label="ย่อหรือขยายคอลัมน์กรณีเสียชีวิต"
                       >
-                        −
+                        +
                       </button>
                     </th>
-                  </tr>
           
                   <tr>
                     <th class="col-surrender-detail">ผลตอบแทน<br />ดัชนี</th>
