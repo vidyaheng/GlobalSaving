@@ -29,6 +29,7 @@
   const LAST_PLAN_KEY = "global_saving_last_plan";
 
   let currentQuote = null;
+  let isSyncingPremiumFields = false;
 
   // =============================
   // DOM helpers
@@ -80,6 +81,25 @@
 
     const n = Number(value) || 0;
     return `${(n * 100).toFixed(2)}%`;
+  }
+
+  function formatInputNumber(value) {
+  const n = Number(value) || 0;
+  const rounded = Math.round((n + Number.EPSILON) * 100) / 100;
+
+  return String(rounded);
+}
+
+  function getSelectedPlan() {
+    const planId = getInputValue("plan-id");
+  
+    if (!planId || typeof getPlan !== "function") return null;
+  
+    return getPlan(planId);
+  }
+  
+  function getMinimumSumAssured(plan) {
+    return Number(plan?.minSumAssured) || 20000;
   }
 
   function tableMoney(value) {
@@ -256,25 +276,109 @@
   }
 
   function updateAutoPremium() {
-    const planId = getInputValue("plan-id");
+    if (isSyncingPremiumFields) return;
+  
+    const plan = getSelectedPlan();
     const sumAssured = Number(getInputValue("sum-assured")) || 0;
   
-    if (!planId || !sumAssured || typeof getPlan !== "function") return;
+    if (!plan || !sumAssured || !window.GSCalc) return;
   
-    const plan = getPlan(planId);
-    if (!plan) return;
+    const minSumAssured = getMinimumSumAssured(plan);
+    const safeSumAssured = Math.max(sumAssured, minSumAssured);
   
-    const rate = plan.basePremiumRate == null ? 1 : Number(plan.basePremiumRate);
-    const premium = Math.round(sumAssured * rate * 100) / 100;
+    isSyncingPremiumFields = true;
   
-    setInputValue("annual-premium", premium);
+    if (safeSumAssured !== sumAssured) {
+      setInputValue("sum-assured", formatInputNumber(safeSumAssured));
+    }
   
-    if (window.GSCalc && typeof GSCalc.calculatePremiumDiscount === "function") {
-      const d = GSCalc.calculatePremiumDiscount(sumAssured, premium);
+    const premiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
+      plan,
+      safeSumAssured
+    );
+  
+    setInputValue("annual-premium", formatInputNumber(premiumBeforeDiscount));
+  
+    if (typeof GSCalc.calculatePremiumDiscount === "function") {
+      const discount = GSCalc.calculatePremiumDiscount(
+        safeSumAssured,
+        premiumBeforeDiscount
+      );
+  
+      setText("summary-sum-assured", money(safeSumAssured));
+      setText(
+        "summary-discount",
+        `${percent(discount.discountRate)} / ${money(discount.discountAmount)}`
+      );
+      setText("summary-premium-after", money(discount.premiumAfterDiscount));
+    }
+  
+    isSyncingPremiumFields = false;
+  }
+
+  function updateSumAssuredFromPremium() {
+    if (isSyncingPremiumFields) return;
+  
+    const plan = getSelectedPlan();
+    const premiumBeforeDiscount = Number(getInputValue("annual-premium")) || 0;
+  
+    if (!plan || !premiumBeforeDiscount || !window.GSCalc) return;
+  
+    const rate =
+      plan.basePremiumRate == null
+        ? 1
+        : Number(plan.basePremiumRate) || 1;
+  
+    let sumAssured = premiumBeforeDiscount / rate;
+  
+    const minSumAssured = getMinimumSumAssured(plan);
+    if (sumAssured < minSumAssured) {
+      sumAssured = minSumAssured;
+    }
+  
+    if (plan.maxSumAssured && sumAssured > plan.maxSumAssured) {
+      sumAssured = Number(plan.maxSumAssured);
+    }
+  
+    const adjustedPremiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
+      plan,
+      sumAssured
+    );
+  
+    isSyncingPremiumFields = true;
+  
+    setInputValue("sum-assured", formatInputNumber(sumAssured));
+    setInputValue("annual-premium", formatInputNumber(adjustedPremiumBeforeDiscount));
+  
+    if (typeof GSCalc.calculatePremiumDiscount === "function") {
+      const discount = GSCalc.calculatePremiumDiscount(
+        sumAssured,
+        adjustedPremiumBeforeDiscount
+      );
   
       setText("summary-sum-assured", money(sumAssured));
-      setText("summary-discount", `${percent(d.discountRate)} / ${money(d.discountAmount)}`);
-      setText("summary-premium-after", money(d.premiumAfterDiscount));
+      setText(
+        "summary-discount",
+        `${percent(discount.discountRate)} / ${money(discount.discountAmount)}`
+      );
+      setText("summary-premium-after", money(discount.premiumAfterDiscount));
+    }
+  
+    isSyncingPremiumFields = false;
+  }
+
+  function enforceMinimumSumAssured() {
+    const plan = getSelectedPlan();
+    const input = $("sum-assured");
+  
+    if (!plan || !input) return;
+  
+    const minSumAssured = getMinimumSumAssured(plan);
+    const currentValue = Number(input.value) || 0;
+  
+    if (currentValue > 0 && currentValue < minSumAssured) {
+      input.value = String(minSumAssured);
+      updateAutoPremium();
     }
   }
 
@@ -641,6 +745,10 @@
     $("btn-export-excel")?.addEventListener("click", handleExportExcel);
   
     $("sum-assured")?.addEventListener("input", updateAutoPremium);
+    $("sum-assured")?.addEventListener("blur", enforceMinimumSumAssured);
+    
+    $("annual-premium")?.addEventListener("input", updateSumAssuredFromPremium);
+    
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
   
     addAutoFormatNumber("sum-assured");
