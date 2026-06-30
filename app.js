@@ -625,7 +625,7 @@
     }
 
     quote.meta = {
-      customerName: input.customerName || "-",
+      customerName: input.customerName || "คุณ ลูกค้า คนสำคัญ",
       advisorName: input.advisorName || "-",
       createdAt: new Date().toISOString(),
       createdDateText: todayText()
