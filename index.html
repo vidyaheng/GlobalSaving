@@ -199,7 +199,7 @@
               <div class="field">
                 <label for="payout-option">การรับเงินระหว่างสัญญา</label>
                 <select id="payout-option" name="payoutOption">
-                  <option value="withdraw">รับเงินออกเมื่อถึงกำหนด</option>
+                  <option value="withdraw">รับเงินคืนเตามรอบปี</option>
                   <option value="accumulate">ฝากสะสมไว้กับบริษัท 0.5% ต่อปี</option>
                 </select>
                 <small>ใช้กับเงินคืนรายปีและผลตอบแทนดัชนีที่ถึงกำหนดจ่าย</small>
@@ -459,8 +459,7 @@
                     </th>
 
                     <th rowspan="2" class="col-cashback-cum">
-                      เงินคืนสะสม<br />
-                      0.5%
+                      <span id="th-cashback-carry-label">เงินคืนรับแล้ว</span>
                     </th>
                     
                     <th rowspan="2">
@@ -477,8 +476,7 @@
                     </th>
                     
                     <th rowspan="2" class="col-index-cum">
-                      ดัชนี<br />
-                      สะสม/รับแล้ว
+                      <span id="th-index-carry-label">ดัชนีรับแล้ว</span>
                     </th>
           
                     <th id="th-surrender-group" colspan="1">
