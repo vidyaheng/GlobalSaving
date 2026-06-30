@@ -57,7 +57,7 @@ const PLANS = {
       gender: "male",
       age: 30,
       sumAssured: 100000,
-      annualPremium: 0,
+      annualPremium: 100000,
       assumedIndexReturn: 5,
       taxRate: 0
     }
@@ -123,7 +123,7 @@ const PLANS = {
       gender: "male",
       age: 30,
       sumAssured: 100000,
-      annualPremium: 0,
+      annualPremium: 100000,
       assumedIndexReturn: 5,
       taxRate: 0
     }
