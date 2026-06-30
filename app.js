@@ -780,6 +780,11 @@
           const shown = table.classList.toggle("show-cashback");
           button.textContent = shown ? "−" : "+";
         }
+
+        if (target === "index-cum") {
+          const shown = table.classList.toggle("show-index-cum");
+          button.textContent = shown ? "−" : "+";
+        }
       });
     });
   
@@ -941,10 +946,10 @@
 
     $("payout-option")?.addEventListener("change", () => {
       if (currentQuote) {
-        setTabEnabled("table", false);
-        activateTab("input");
+        $("quote-form")?.requestSubmit();
       }
     });
+    
   
     // addAutoFormatNumber("sum-assured"); ปิดการแสดงค่าเป็นจำนวนเต็มไว้ก่อน ต้องการแสดงเป็น ทศนิยม
 
