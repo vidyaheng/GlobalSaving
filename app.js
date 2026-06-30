@@ -839,7 +839,7 @@
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="13" class="empty-table">
+          <td colspan="14" class="empty-table">
             กรุณากดคำนวณเพื่อแสดงตาราง
           </td>
         </tr>
