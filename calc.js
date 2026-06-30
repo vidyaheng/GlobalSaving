@@ -369,7 +369,8 @@
     annualPremiumBeforeDiscount,
     annualPremiumAfterDiscount,
     discountAmountPerYear,
-    assumedIndexReturn
+    assumedIndexReturn,
+    payoutOption = "withdraw"
   }) {
     const assumptions = getDefaultPlanAssumptions(plan.id);
   
@@ -388,21 +389,31 @@
     const indexParticipationRate =
       plan.indexParticipationRate ?? assumptions.indexParticipationRate;
   
+    const shouldAccumulatePayouts = payoutOption === "accumulate";
+    const depositInterestRate = 0.005;
+  
     const rows = [];
   
     let cumulativePremiumBeforeDiscount = 0;
     let cumulativeDiscount = 0;
     let cumulativePremiumAfterDiscount = 0;
   
-    // รวมเงินคืน + เงินครบกำหนด สำหรับ summary กรณีมีชีวิตอยู่
+    // รวมเงินคืนทั้งหมดตามกรมธรรม์ รวมเงินครบกำหนด
     let cumulativeCashback = 0;
   
-    // เงินคืนรายปีที่รับมาแล้วจริง ๆ ไม่รวมเงินครบกำหนด
+    // กรณีรับเงินออก: เงินคืนที่เคยรับออกแล้วก่อนปีปัจจุบัน
     let cumulativeReceivedCashback = 0;
   
-    // ผลตอบแทนดัชนีที่เคยรับมาแล้ว เช่น ปี 10
+    // กรณีรับเงินออก: ผลตอบแทนดัชนีที่เคยรับออกแล้วก่อนปีปัจจุบัน
     let cumulativeReceivedLivingIndexBenefit = 0;
   
+    // กรณีฝากสะสม: เงินคืนสะสมพร้อมดอกเบี้ย 0.5%
+    let accumulatedCashbackBalance = 0;
+  
+    // กรณีฝากสะสม: ผลตอบแทนดัชนีสะสมพร้อมดอกเบี้ย 0.5%
+    let accumulatedLivingIndexBenefitBalance = 0;
+  
+    // รวมผลตอบแทนดัชนีกรณีมีชีวิตอยู่ สำหรับ summary
     let cumulativeIndexBenefit = 0;
   
     for (let year = 1; year <= coverageYears; year++) {
@@ -460,11 +471,6 @@
       const annualCashback = isMaturityYear ? 0 : livingBenefit;
       const guaranteedMaturityBenefit = isMaturityYear ? livingBenefit : 0;
   
-      cumulativeCashback = roundMoney(cumulativeCashback + livingBenefit);
-      cumulativeReceivedCashback = roundMoney(
-        cumulativeReceivedCashback + annualCashback
-      );
-  
       const baseIndexBenefit = calculateIndexFormulaAmount({
         policyYear: year,
         cumulativePremiumAfterDiscount,
@@ -472,7 +478,7 @@
         participationRate: indexParticipationRate
       });
   
-      // กรณีมีชีวิตอยู่
+      // กรณีมีชีวิตอยู่ ได้ผลตอบแทนดัชนี ณ ปีที่กำหนด เช่น ปี 10, 15
       const indexPayoutRate = getIndexPayoutRate(indexPayoutRates, year);
   
       const projectedIndexBenefit = roundMoney(
@@ -480,10 +486,15 @@
       );
   
       // สำคัญ:
-      // ถ้าเสียชีวิต/เวนคืนในปีนี้ จะนับเฉพาะผลตอบแทนดัชนีที่เคยรับมาแล้วก่อนปีนี้
-      // เช่น ปี 11-15 ของ 15/8 จะรวมผลตอบแทนดัชนีที่รับไปแล้วในปี 10
-      const receivedLivingIndexBeforeThisYear =
-        cumulativeReceivedLivingIndexBenefit;
+      // ถ้าเวนคืน/เสียชีวิตในปีนี้ ให้ใช้มูลค่าที่ "มีอยู่ก่อนปีนี้"
+      // เพื่อไม่ double count เงินคืน/ผลตอบแทนดัชนีที่เพิ่งจะจ่าย ณ สิ้นปีนี้
+      const priorCashbackValue = shouldAccumulatePayouts
+        ? accumulatedCashbackBalance
+        : cumulativeReceivedCashback;
+  
+      const priorIndexValue = shouldAccumulatePayouts
+        ? accumulatedLivingIndexBenefitBalance
+        : cumulativeReceivedLivingIndexBenefit;
   
       const deathIndexPayoutRate = getIndexPayoutRate(
         deathIndexPayoutRates,
@@ -506,19 +517,26 @@
       const deathTotal = roundMoney(
         deathGuaranteed +
           deathIndexBenefit +
-          cumulativeReceivedCashback +
-          receivedLivingIndexBeforeThisYear
+          priorCashbackValue +
+          priorIndexValue
       );
   
       const surrenderTotal = roundMoney(
         surrenderGuaranteed +
           surrenderIndexBenefit +
-          cumulativeReceivedCashback +
-          receivedLivingIndexBeforeThisYear
+          priorCashbackValue +
+          priorIndexValue
       );
   
       const totalBenefitThisYear = roundMoney(
         livingBenefit + projectedIndexBenefit
+      );
+  
+      // อัปเดตยอดหลังจบปีนี้ สำหรับใช้แสดงใน row และใช้เป็น prior ของปีถัดไป
+      cumulativeCashback = roundMoney(cumulativeCashback + livingBenefit);
+  
+      cumulativeReceivedCashback = roundMoney(
+        cumulativeReceivedCashback + livingBenefit
       );
   
       cumulativeIndexBenefit = roundMoney(
@@ -528,6 +546,23 @@
       cumulativeReceivedLivingIndexBenefit = roundMoney(
         cumulativeReceivedLivingIndexBenefit + projectedIndexBenefit
       );
+  
+      accumulatedCashbackBalance = roundMoney(
+        accumulatedCashbackBalance * (1 + depositInterestRate) + livingBenefit
+      );
+  
+      accumulatedLivingIndexBenefitBalance = roundMoney(
+        accumulatedLivingIndexBenefitBalance * (1 + depositInterestRate) +
+          projectedIndexBenefit
+      );
+  
+      const carriedCashbackValue = shouldAccumulatePayouts
+        ? accumulatedCashbackBalance
+        : cumulativeReceivedCashback;
+  
+      const carriedIndexValue = shouldAccumulatePayouts
+        ? accumulatedLivingIndexBenefitBalance
+        : cumulativeReceivedLivingIndexBenefit;
   
       rows.push({
         policyYear: year,
@@ -545,16 +580,25 @@
         cumulativeCashback,
         cumulativeReceivedCashback,
   
+        livingBenefit,
+        accumulatedLivingBenefit,
+  
+        payoutOption,
+        shouldAccumulatePayouts,
+  
+        priorCashbackValue,
+        priorIndexValue,
+        carriedCashbackValue,
+        carriedIndexValue,
+  
         indexPayoutRate,
         projectedIndexBenefit,
         cumulativeIndexBenefit,
         cumulativeReceivedLivingIndexBenefit,
+        accumulatedLivingIndexBenefitBalance,
   
         guaranteedMaturityBenefit,
         totalBenefitThisYear,
-  
-        livingBenefit,
-        accumulatedLivingBenefit,
   
         baseIndexBenefit,
   
@@ -595,6 +639,9 @@
     const assumedIndexReturn = toNumber(input.assumedIndexReturn, 0);
     const taxRate = toNumber(input.taxRate, 0);
 
+    const payoutOption =
+      input.payoutOption === "accumulate" ? "accumulate" : "withdraw";
+
     const discount = calculatePremiumDiscount(
       sumAssured,
       annualPremiumBeforeDiscount
@@ -620,7 +667,8 @@
       annualPremiumBeforeDiscount: discount.premiumBeforeDiscount,
       annualPremiumAfterDiscount: discount.premiumAfterDiscount,
       discountAmountPerYear: discount.discountAmount,
-      assumedIndexReturn
+      assumedIndexReturn,
+      payoutOption
     });
 
     const finalRow = yearlyTable[yearlyTable.length - 1];
@@ -652,6 +700,12 @@
 
       assumedIndexReturn,
       taxRate,
+
+      payoutOption,
+      payoutOptionLabel:
+        payoutOption === "accumulate"
+          ? "ฝากสะสมไว้กับบริษัท 0.5% ต่อปี"
+          : "รับเงินออกเมื่อถึงกำหนด",
 
       totalCashback: finalRow.cumulativeCashback,
       accumulatedLivingBenefit: finalRow.accumulatedLivingBenefit,
@@ -698,6 +752,7 @@
       ["ส่วนลดรวม", formatMoney(s.totalDiscount)],
       ["เบี้ยรวมหลังส่วนลด", formatMoney(s.totalPremiumAfterDiscount)],
       ["ผลตอบแทนดัชนีสมมติเฉลี่ยต่อปี", `${s.assumedIndexReturn}%`],
+      ["การรับเงินระหว่างสัญญา", s.payoutOptionLabel],
       ["เงินจ่ายคืนรวม", formatMoney(s.totalCashback)],
       ["ผลตอบแทนดัชนีประมาณการ", formatMoney(s.totalProjectedIndexBenefit)],
       ["ผลประโยชน์ครบกำหนดแบบรับรอง", formatMoney(s.guaranteedMaturityBenefit)],
@@ -707,21 +762,33 @@
 
   function toYearlyTableRows(quote) {
     if (!quote || !quote.ok) return [];
-
+  
     return quote.yearlyTable.map((row) => ({
       "ปีกรมธรรม์": row.policyYear,
       "อายุ": row.age,
+  
       "เบี้ยก่อนส่วนลด": row.premiumBeforeDiscount,
       "ส่วนลด": row.discountAmount,
       "เบี้ยหลังส่วนลด": row.premiumAfterDiscount,
       "เบี้ยสะสมหลังส่วนลด": row.cumulativePremiumAfterDiscount,
-      "เงินจ่ายคืนรายปี": row.annualCashback,
-      "เงินจ่ายคืนสะสม": row.cumulativeCashback,
+  
+      "เงินคืน": row.livingBenefit,
+      "เงินคืนสะสม/รับแล้ว": row.carriedCashbackValue,
+  
       "อัตราจ่ายผลตอบแทนดัชนี": row.indexPayoutRate,
-      "ผลตอบแทนดัชนีประมาณการ": row.projectedIndexBenefit,
-      "ผลตอบแทนดัชนีสะสม": row.cumulativeIndexBenefit,
+      "ผลตอบแทนดัชนีกรณีมีชีวิตอยู่": row.projectedIndexBenefit,
+      "ผลตอบแทนดัชนีสะสม/รับแล้ว": row.carriedIndexValue,
+  
       "ผลประโยชน์ครบกำหนด": row.guaranteedMaturityBenefit,
-      "ผลประโยชน์รวมปีนี้": row.totalBenefitThisYear
+      "ผลประโยชน์รวมปีนี้": row.totalBenefitThisYear,
+  
+      "ผลตอบแทนดัชนีกรณีเวนคืน": row.surrenderIndexBenefit,
+      "เงินค่าเวนคืนรับรอง": row.surrenderGuaranteed,
+      "ผลประโยชน์รวมกรณีเวนคืน": row.surrenderTotal,
+  
+      "ผลตอบแทนดัชนีกรณีเสียชีวิต": row.deathIndexBenefit,
+      "ความคุ้มครองชีวิตรับรอง": row.deathGuaranteed,
+      "ผลประโยชน์รวมกรณีเสียชีวิต": row.deathTotal
     }));
   }
 
