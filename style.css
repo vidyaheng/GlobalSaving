@@ -1039,6 +1039,80 @@ tbody tr:last-child td {
 }
 
 /* =========================
+   Compact Benefit Table
+========================= */
+
+.compact-benefit-table {
+  min-width: 0 !important;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.compact-benefit-table th,
+.compact-benefit-table td {
+  padding: 8px 6px;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  white-space: normal;
+  word-break: keep-all;
+  vertical-align: middle;
+  border-right: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.compact-benefit-table th:last-child,
+.compact-benefit-table td:last-child {
+  border-right: 0;
+}
+
+.compact-benefit-table tbody tr:nth-child(even) {
+  background: rgba(248, 250, 252, 0.85);
+}
+
+.compact-benefit-table tbody tr:nth-child(odd) {
+  background: #ffffff;
+}
+
+.compact-benefit-table tbody tr:hover {
+  background: rgba(232, 242, 255, 0.65);
+}
+
+.compact-benefit-table th {
+  background: #edf4ff;
+  color: var(--primary-dark);
+}
+
+.compact-benefit-table .total-cell {
+  background: rgba(232, 242, 255, 0.55);
+  font-weight: 900;
+}
+
+/* column width */
+.compact-benefit-table th:nth-child(1),
+.compact-benefit-table td:nth-child(1) {
+  width: 5%;
+}
+
+.compact-benefit-table th:nth-child(2),
+.compact-benefit-table td:nth-child(2) {
+  width: 6%;
+}
+
+.compact-benefit-table th:nth-child(3),
+.compact-benefit-table td:nth-child(3) {
+  width: 13%;
+}
+
+.compact-benefit-table th:nth-child(4),
+.compact-benefit-table td:nth-child(4) {
+  width: 13%;
+}
+
+.compact-benefit-table th:nth-child(5),
+.compact-benefit-table td:nth-child(5) {
+  width: 14%;
+}
+
+/* =========================
    Responsive
 ========================= */
 
@@ -1298,76 +1372,4 @@ tbody tr:last-child td {
   }
 }
 
-/* =========================
-   Compact Benefit Table
-========================= */
 
-.compact-benefit-table {
-  min-width: 0 !important;
-  width: 100%;
-  table-layout: fixed;
-}
-
-.compact-benefit-table th,
-.compact-benefit-table td {
-  padding: 8px 6px;
-  font-size: 0.78rem;
-  line-height: 1.25;
-  white-space: normal;
-  word-break: keep-all;
-  vertical-align: middle;
-  border-right: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.compact-benefit-table th:last-child,
-.compact-benefit-table td:last-child {
-  border-right: 0;
-}
-
-.compact-benefit-table tbody tr:nth-child(even) {
-  background: rgba(248, 250, 252, 0.85);
-}
-
-.compact-benefit-table tbody tr:nth-child(odd) {
-  background: #ffffff;
-}
-
-.compact-benefit-table tbody tr:hover {
-  background: rgba(232, 242, 255, 0.65);
-}
-
-.compact-benefit-table th {
-  background: #edf4ff;
-  color: var(--primary-dark);
-}
-
-.compact-benefit-table .total-cell {
-  background: rgba(232, 242, 255, 0.55);
-  font-weight: 900;
-}
-
-/* column width */
-.compact-benefit-table th:nth-child(1),
-.compact-benefit-table td:nth-child(1) {
-  width: 5%;
-}
-
-.compact-benefit-table th:nth-child(2),
-.compact-benefit-table td:nth-child(2) {
-  width: 6%;
-}
-
-.compact-benefit-table th:nth-child(3),
-.compact-benefit-table td:nth-child(3) {
-  width: 13%;
-}
-
-.compact-benefit-table th:nth-child(4),
-.compact-benefit-table td:nth-child(4) {
-  width: 13%;
-}
-
-.compact-benefit-table th:nth-child(5),
-.compact-benefit-table td:nth-child(5) {
-  width: 14%;
-}
