@@ -364,6 +364,10 @@
       if (plan.defaultInput.assumedIndexReturn != null) {
         setInputValue("assumed-index-return", plan.defaultInput.assumedIndexReturn);
       }
+
+      if (plan.defaultInput.payoutOption) {
+        setInputValue("payout-option", plan.defaultInput.payoutOption);
+      }
   
       if (plan.defaultInput.taxRate != null) {
         setInputValue("tax-rate", plan.defaultInput.taxRate);
@@ -596,6 +600,7 @@
       annualPremium: getInputValue("annual-premium"),
       assumedIndexReturn: getInputValue("assumed-index-return"),
       taxRate: getInputValue("tax-rate"),
+      payoutOption: getInputValue("payout-option"),
 
       customerName: getInputValue("customer-name").trim(),
       advisorName: getInputValue("advisor-name").trim()
@@ -925,6 +930,13 @@
     $("annual-premium")?.addEventListener("blur", enforceMinimumPremium);
     
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
+
+    $("payout-option")?.addEventListener("change", () => {
+      if (currentQuote) {
+        setTabEnabled("table", false);
+        activateTab("input");
+      }
+    });
   
     // addAutoFormatNumber("sum-assured"); ปิดการแสดงค่าเป็นจำนวนเต็มไว้ก่อน ต้องการแสดงเป็น ทศนิยม
 
