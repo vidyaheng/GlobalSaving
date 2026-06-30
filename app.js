@@ -730,6 +730,14 @@
   
       const taxSaving = calculateTaxSaving(row, quote);
   
+      // ถ้า calc.js ใหม่มี carriedCashbackValue / carriedIndexValue ให้ใช้ตัวนั้น
+      // ถ้ายังไม่มี ให้ fallback เป็นค่าเดิม เพื่อกันตารางพัง
+      const cashbackCarryValue =
+        row.carriedCashbackValue ?? row.accumulatedLivingBenefit ?? 0;
+  
+      const indexCarryValue =
+        row.carriedIndexValue ?? row.cumulativeReceivedLivingIndexBenefit ?? 0;
+  
       tr.innerHTML = `
         <td>${row.policyYear}</td>
         <td>${row.age}</td>
@@ -738,14 +746,14 @@
         ${tableCell(taxSaving, "col-tax")}
   
         ${tableCell(row.livingBenefit)}
-        ${tableCell(row.accumulatedLivingBenefit, "col-cashback-cum")}
+        ${tableCell(cashbackCarryValue, "col-cashback-cum")}
         ${tableCell(row.projectedIndexBenefit)}
-        
+        ${tableCell(indexCarryValue, "col-index-cum")}
   
         ${tableCell(row.surrenderIndexBenefit, "col-surrender-detail")}
         ${tableCell(row.surrenderGuaranteed, "col-surrender-detail")}
         ${tableCell(row.surrenderTotal, "total-cell")}
-        
+  
         ${tableCell(row.deathIndexBenefit, "col-death-detail")}
         ${tableCell(row.deathGuaranteed, "col-death-detail")}
         ${tableCell(row.deathTotal, "total-cell")}
