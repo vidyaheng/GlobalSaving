@@ -824,7 +824,8 @@ tbody tr:last-child td {
 
 /* default: ซ่อน column เสริม */
 .benefit-table .col-tax,
-.benefit-table .col-cashback-cum {
+.benefit-table .col-cashback-cum,
+.benefit-table .col-index-cum {
   display: none;
 }
 
@@ -834,6 +835,10 @@ tbody tr:last-child td {
 }
 
 .benefit-table.show-cashback .col-cashback-cum {
+  display: table-cell;
+}
+
+.benefit-table.show-index-cum .col-index-cum {
   display: table-cell;
 }
 
