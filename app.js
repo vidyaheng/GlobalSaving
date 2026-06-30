@@ -11,22 +11,27 @@
 
   // เปลี่ยน PIN ตรงนี้
   // หมายเหตุ: PIN แบบนี้เป็น soft lock เท่านั้น ไม่ใช่ security จริง
-  const APP_PINS = new Set([
-    "104669",
-    "114252",
-    "114460",
-    "126462",
-    "126641",
-    "126666",
-    "130079",
-    "132987",
-    "094373",
-    "071253",
-    "102288"
-  ]);
+  const PIN_ADVISOR_NAMES = {
+    "104669": "พิชญา",
+    "114252": "วิทยา",
+    "114460": "รณิดา",
+    "126462": "วรรณนิภา",
+    "126641": "กษมา",
+    "126666": "ภรินทร์ธร",
+    "130079": "การดา",
+    "132987": "อนุชิต",
+    "094373": "โมเม",
+    "071253": "",
+    "102288": "",
+    "141545": "ศรัญญา"
+  };
+  
+  const APP_PINS = new Set(Object.keys(PIN_ADVISOR_NAMES));
 
   const AUTH_KEY = "global_saving_auth";
   const LAST_PLAN_KEY = "global_saving_last_plan";
+
+  const ADVISOR_NAME_KEY = "global_saving_advisor_name";
 
   let currentQuote = null;
   let isSyncingPremiumFields = false;
@@ -233,6 +238,29 @@
     }
   }
 
+  function setAdvisorNameFromPin(pin) {
+    const advisorName = PIN_ADVISOR_NAMES[pin] || "";
+    sessionStorage.setItem(ADVISOR_NAME_KEY, advisorName);
+    return advisorName;
+  }
+  
+  function getAdvisorNameFromSession() {
+    return sessionStorage.getItem(ADVISOR_NAME_KEY) || "";
+  }
+  
+  function applyAdvisorNameFromPin(options = {}) {
+    const { force = false } = options;
+    const input = $("advisor-name");
+  
+    if (!input) return;
+  
+    const advisorName = getAdvisorNameFromSession();
+  
+    if (force || !input.value.trim()) {
+      input.value = advisorName;
+    }
+  }
+
   function renderAuthState() {
     const loginScreen = $("login-screen");
     const appShell = $("app-shell");
@@ -255,14 +283,20 @@
 
     if (APP_PINS.has(pin)) {
       setAuthenticated(true);
+      setAdvisorNameFromPin(pin);
+    
       hide(error);
       if (input) input.value = "";
-
+    
       writeLog("login", {
+        pin,
+        advisorName: getAdvisorNameFromSession(),
         at: new Date().toISOString()
       });
-
+    
       renderAuthState();
+      applyAdvisorNameFromPin({ force: true });
+    
       return;
     }
 
@@ -276,8 +310,10 @@
     writeLog("logout", {
       at: new Date().toISOString()
     });
-
+  
     setAuthenticated(false);
+    sessionStorage.removeItem(ADVISOR_NAME_KEY);
+  
     currentQuote = null;
     renderAuthState();
   }
@@ -755,6 +791,8 @@
     if (form) form.reset();
 
     applyPlanDefaults();
+
+    applyAdvisorNameFromPin({ force: true });
 
     currentQuote = null;
 
