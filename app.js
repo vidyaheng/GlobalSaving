@@ -279,33 +279,33 @@
     if (isSyncingPremiumFields) return;
   
     const plan = getSelectedPlan();
-    const sumAssured = Number(getInputValue("sum-assured")) || 0;
+    const rawValue = getInputValue("sum-assured");
+    const sumAssured = Number(rawValue) || 0;
   
-    if (!plan || !sumAssured || !window.GSCalc) return;
+    if (!plan || !window.GSCalc) return;
   
-    const minSumAssured = getMinimumSumAssured(plan);
-    const safeSumAssured = Math.max(sumAssured, minSumAssured);
+    // สำคัญ: ระหว่างกำลังพิมพ์ ถ้าว่างหรือเป็น 0 ยังไม่ต้องเด้งกลับเป็น 20,000
+    if (!rawValue || sumAssured <= 0) {
+      setInputValue("annual-premium", "");
+      return;
+    }
   
     isSyncingPremiumFields = true;
   
-    if (safeSumAssured !== sumAssured) {
-      setInputValue("sum-assured", formatInputNumber(safeSumAssured));
-    }
-  
     const premiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
       plan,
-      safeSumAssured
+      sumAssured
     );
   
     setInputValue("annual-premium", formatInputNumber(premiumBeforeDiscount));
   
     if (typeof GSCalc.calculatePremiumDiscount === "function") {
       const discount = GSCalc.calculatePremiumDiscount(
-        safeSumAssured,
+        sumAssured,
         premiumBeforeDiscount
       );
   
-      setText("summary-sum-assured", money(safeSumAssured));
+      setText("summary-sum-assured", money(sumAssured));
       setText(
         "summary-discount",
         `${percent(discount.discountRate)} / ${money(discount.discountAmount)}`
@@ -320,40 +320,32 @@
     if (isSyncingPremiumFields) return;
   
     const plan = getSelectedPlan();
-    const premiumBeforeDiscount = Number(getInputValue("annual-premium")) || 0;
+    const rawValue = getInputValue("annual-premium");
+    const premiumBeforeDiscount = Number(rawValue) || 0;
   
-    if (!plan || !premiumBeforeDiscount || !window.GSCalc) return;
+    if (!plan || !window.GSCalc) return;
+  
+    // สำคัญ: ระหว่างกำลังพิมพ์ ถ้าว่างหรือเป็น 0 ยังไม่ต้องเด้งกลับ
+    if (!rawValue || premiumBeforeDiscount <= 0) {
+      setInputValue("sum-assured", "");
+      return;
+    }
   
     const rate =
       plan.basePremiumRate == null
         ? 1
         : Number(plan.basePremiumRate) || 1;
   
-    let sumAssured = premiumBeforeDiscount / rate;
-  
-    const minSumAssured = getMinimumSumAssured(plan);
-    if (sumAssured < minSumAssured) {
-      sumAssured = minSumAssured;
-    }
-  
-    if (plan.maxSumAssured && sumAssured > plan.maxSumAssured) {
-      sumAssured = Number(plan.maxSumAssured);
-    }
-  
-    const adjustedPremiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
-      plan,
-      sumAssured
-    );
+    const sumAssured = premiumBeforeDiscount / rate;
   
     isSyncingPremiumFields = true;
   
     setInputValue("sum-assured", formatInputNumber(sumAssured));
-    setInputValue("annual-premium", formatInputNumber(adjustedPremiumBeforeDiscount));
   
     if (typeof GSCalc.calculatePremiumDiscount === "function") {
       const discount = GSCalc.calculatePremiumDiscount(
         sumAssured,
-        adjustedPremiumBeforeDiscount
+        premiumBeforeDiscount
       );
   
       setText("summary-sum-assured", money(sumAssured));
@@ -382,6 +374,33 @@
     }
   }
 
+  function enforceMinimumPremium() {
+    const plan = getSelectedPlan();
+    const input = $("annual-premium");
+  
+    if (!plan || !input || !window.GSCalc) return;
+  
+    const premium = Number(input.value) || 0;
+    if (premium <= 0) return;
+  
+    const minSumAssured = getMinimumSumAssured(plan);
+    const minPremium = GSCalc.calculateBaseAnnualPremium(plan, minSumAssured);
+  
+    if (premium < minPremium) {
+      isSyncingPremiumFields = true;
+  
+      setInputValue("sum-assured", formatInputNumber(minSumAssured));
+      setInputValue("annual-premium", formatInputNumber(minPremium));
+  
+      isSyncingPremiumFields = false;
+  
+      updateAutoPremium();
+      return;
+    }
+  
+    updateSumAssuredFromPremium();
+  }
+  
   function activateTab(tabName) {
     document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
       const isActive = panel.dataset.tabPanel === tabName;
@@ -748,6 +767,7 @@
     $("sum-assured")?.addEventListener("blur", enforceMinimumSumAssured);
     
     $("annual-premium")?.addEventListener("input", updateSumAssuredFromPremium);
+    $("annual-premium")?.addEventListener("blur", enforceMinimumPremium);
     
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
   
