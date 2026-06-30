@@ -59,7 +59,8 @@ const PLANS = {
       sumAssured: 100000,
       annualPremium: 100000,
       assumedIndexReturn: 5,
-      taxRate: 0
+      taxRate: 0,
+      payoutOption: "withdraw"
     }
   },
 
@@ -125,7 +126,8 @@ const PLANS = {
       sumAssured: 100000,
       annualPremium: 100000,
       assumedIndexReturn: 5,
-      taxRate: 0
+      taxRate: 0,
+      payoutOption: "withdraw"
     }
   }
 };
