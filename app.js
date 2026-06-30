@@ -102,6 +102,72 @@
     return Number(plan?.minSumAssured) || 20000;
   }
 
+  function getBasePremiumRate(plan) {
+    return plan?.basePremiumRate == null
+      ? 1
+      : Number(plan.basePremiumRate) || 1;
+  }
+  
+  function getDiscountTiersForPremiumInput(plan) {
+    const minSumAssured = getMinimumSumAssured(plan);
+    const maxSumAssured = Number(plan?.maxSumAssured) || Infinity;
+  
+    return [
+      {
+        min: minSumAssured,
+        max: Math.min(99999.999999, maxSumAssured),
+        discountRate: 0
+      },
+      {
+        min: Math.max(100000, minSumAssured),
+        max: Math.min(499999.999999, maxSumAssured),
+        discountRate: 0.005
+      },
+      {
+        min: Math.max(500000, minSumAssured),
+        max: maxSumAssured,
+        discountRate: 0.01
+      }
+    ].filter((tier) => tier.min <= tier.max);
+  }
+  
+  function calculateSumAssuredFromFinalPremium(plan, annualPremiumAfterDiscount) {
+    const finalPremium = Number(annualPremiumAfterDiscount) || 0;
+    const baseRate = getBasePremiumRate(plan);
+  
+    if (!finalPremium || finalPremium <= 0) return 0;
+  
+    const candidates = [];
+  
+    getDiscountTiersForPremiumInput(plan).forEach((tier) => {
+      const divisor = baseRate - tier.discountRate;
+      if (divisor <= 0) return;
+  
+      const sumAssured = finalPremium / divisor;
+  
+      if (
+        sumAssured >= tier.min - 0.01 &&
+        sumAssured <= tier.max + 0.01
+      ) {
+        candidates.push({
+          sumAssured,
+          discountRate: tier.discountRate
+        });
+      }
+    });
+  
+    // ถ้ามีหลาย candidate ช่วงรอยต่อส่วนลด ให้เลือกทุนที่สูงกว่า
+    // เพราะลูกค้ากรอก "เบี้ยที่อยากจ่ายจริง" แล้วควรได้ทุนสูงสุดที่สอดคล้องกับส่วนลด
+    if (candidates.length > 0) {
+      return candidates.reduce((best, item) => {
+        return item.sumAssured > best.sumAssured ? item : best;
+      }).sumAssured;
+    }
+  
+    // fallback สำหรับช่วงกำลังพิมพ์หรือค่าที่ต่ำมาก
+    return finalPremium / baseRate;
+  }
+
   function tableMoney(value) {
     const n = Number(value) || 0;
   
@@ -284,34 +350,35 @@
   
     if (!plan || !window.GSCalc) return;
   
-    // สำคัญ: ระหว่างกำลังพิมพ์ ถ้าว่างหรือเป็น 0 ยังไม่ต้องเด้งกลับเป็น 20,000
     if (!rawValue || sumAssured <= 0) {
       setInputValue("annual-premium", "");
       return;
     }
-  
-    isSyncingPremiumFields = true;
   
     const premiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
       plan,
       sumAssured
     );
   
-    setInputValue("annual-premium", formatInputNumber(premiumBeforeDiscount));
+    const discount = GSCalc.calculatePremiumDiscount(
+      sumAssured,
+      premiumBeforeDiscount
+    );
   
-    if (typeof GSCalc.calculatePremiumDiscount === "function") {
-      const discount = GSCalc.calculatePremiumDiscount(
-        sumAssured,
-        premiumBeforeDiscount
-      );
+    isSyncingPremiumFields = true;
   
-      setText("summary-sum-assured", money(sumAssured));
-      setText(
-        "summary-discount",
-        `${percent(discount.discountRate)} / ${money(discount.discountAmount)}`
-      );
-      setText("summary-premium-after", money(discount.premiumAfterDiscount));
-    }
+    // สำคัญ: ช่องเบี้ยต้องแสดง "เบี้ยหลังส่วนลด" ที่ลูกค้าจ่ายจริง
+    setInputValue(
+      "annual-premium",
+      formatInputNumber(discount.premiumAfterDiscount)
+    );
+  
+    setText("summary-sum-assured", money(sumAssured));
+    setText(
+      "summary-discount",
+      `${percent(discount.discountRate)} / ${money(discount.discountAmount)}`
+    );
+    setText("summary-premium-after", money(discount.premiumAfterDiscount));
   
     isSyncingPremiumFields = false;
   }
@@ -321,40 +388,40 @@
   
     const plan = getSelectedPlan();
     const rawValue = getInputValue("annual-premium");
-    const premiumBeforeDiscount = Number(rawValue) || 0;
+    const annualPremiumAfterDiscount = Number(rawValue) || 0;
   
     if (!plan || !window.GSCalc) return;
   
-    // สำคัญ: ระหว่างกำลังพิมพ์ ถ้าว่างหรือเป็น 0 ยังไม่ต้องเด้งกลับ
-    if (!rawValue || premiumBeforeDiscount <= 0) {
+    if (!rawValue || annualPremiumAfterDiscount <= 0) {
       setInputValue("sum-assured", "");
       return;
     }
   
-    const rate =
-      plan.basePremiumRate == null
-        ? 1
-        : Number(plan.basePremiumRate) || 1;
+    const sumAssured = calculateSumAssuredFromFinalPremium(
+      plan,
+      annualPremiumAfterDiscount
+    );
   
-    const sumAssured = premiumBeforeDiscount / rate;
+    const premiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
+      plan,
+      sumAssured
+    );
+  
+    const discount = GSCalc.calculatePremiumDiscount(
+      sumAssured,
+      premiumBeforeDiscount
+    );
   
     isSyncingPremiumFields = true;
   
     setInputValue("sum-assured", formatInputNumber(sumAssured));
   
-    if (typeof GSCalc.calculatePremiumDiscount === "function") {
-      const discount = GSCalc.calculatePremiumDiscount(
-        sumAssured,
-        premiumBeforeDiscount
-      );
-  
-      setText("summary-sum-assured", money(sumAssured));
-      setText(
-        "summary-discount",
-        `${percent(discount.discountRate)} / ${money(discount.discountAmount)}`
-      );
-      setText("summary-premium-after", money(discount.premiumAfterDiscount));
-    }
+    setText("summary-sum-assured", money(sumAssured));
+    setText(
+      "summary-discount",
+      `${percent(discount.discountRate)} / ${money(discount.discountAmount)}`
+    );
+    setText("summary-premium-after", money(discount.premiumAfterDiscount));
   
     isSyncingPremiumFields = false;
   }
@@ -380,17 +447,31 @@
   
     if (!plan || !input || !window.GSCalc) return;
   
-    const premium = Number(input.value) || 0;
-    if (premium <= 0) return;
+    const annualPremiumAfterDiscount = Number(input.value) || 0;
+    if (annualPremiumAfterDiscount <= 0) return;
   
     const minSumAssured = getMinimumSumAssured(plan);
-    const minPremium = GSCalc.calculateBaseAnnualPremium(plan, minSumAssured);
   
-    if (premium < minPremium) {
+    const minPremiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
+      plan,
+      minSumAssured
+    );
+  
+    const minDiscount = GSCalc.calculatePremiumDiscount(
+      minSumAssured,
+      minPremiumBeforeDiscount
+    );
+  
+    const minPremiumAfterDiscount = minDiscount.premiumAfterDiscount;
+  
+    if (annualPremiumAfterDiscount < minPremiumAfterDiscount) {
       isSyncingPremiumFields = true;
   
       setInputValue("sum-assured", formatInputNumber(minSumAssured));
-      setInputValue("annual-premium", formatInputNumber(minPremium));
+      setInputValue(
+        "annual-premium",
+        formatInputNumber(minPremiumAfterDiscount)
+      );
   
       isSyncingPremiumFields = false;
   
@@ -398,7 +479,32 @@
       return;
     }
   
-    updateSumAssuredFromPremium();
+    const sumAssured = calculateSumAssuredFromFinalPremium(
+      plan,
+      annualPremiumAfterDiscount
+    );
+  
+    const premiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
+      plan,
+      sumAssured
+    );
+  
+    const discount = GSCalc.calculatePremiumDiscount(
+      sumAssured,
+      premiumBeforeDiscount
+    );
+  
+    isSyncingPremiumFields = true;
+  
+    setInputValue("sum-assured", formatInputNumber(sumAssured));
+    setInputValue(
+      "annual-premium",
+      formatInputNumber(discount.premiumAfterDiscount)
+    );
+  
+    isSyncingPremiumFields = false;
+  
+    updateAutoPremium();
   }
   
   function activateTab(tabName) {
