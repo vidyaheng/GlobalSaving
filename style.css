@@ -891,6 +891,32 @@ tbody tr:last-child td {
 }
 
 /* =========================
+   Form Input Value Emphasis
+========================= */
+
+.field input,
+.field select,
+.field textarea {
+  color: #0f3f7a;
+  font-weight: 800;
+}
+
+/* placeholder ยังให้สีอ่อน ไม่แย่งกับค่าจริง */
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ตอน focus ให้ยังเป็นน้ำเงินเข้ม */
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  color: #0f3f7a;
+  font-weight: 800;
+}
+
+/* =========================
    Responsive
 ========================= */
 
