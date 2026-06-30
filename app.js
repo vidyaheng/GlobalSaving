@@ -670,6 +670,7 @@
   function renderQuote(quote) {
     renderLiveSummary(quote);
     renderReport(quote);
+    renderPayoutOptionLabels(quote);
     renderYearlyTable(quote);
   }
 
@@ -717,6 +718,29 @@
     setText("report-index-benefit", money(s.totalProjectedIndexBenefit));
     setText("report-maturity-benefit", money(s.guaranteedMaturityBenefit));
     setText("report-total-benefit", money(s.projectedTotalBenefit));
+  }
+
+  function renderPayoutOptionLabels(quote) {
+    const isAccumulate = quote?.summary?.payoutOption === "accumulate";
+  
+    const cashbackLabel = isAccumulate
+      ? "เงินคืนสะสม 0.5%"
+      : "เงินคืนรับแล้ว";
+  
+    const indexLabel = isAccumulate
+      ? "ดัชนีสะสม 0.5%"
+      : "ดัชนีรับแล้ว";
+  
+    const cashbackEl = $("th-cashback-carry-label");
+    const indexEl = $("th-index-carry-label");
+  
+    if (cashbackEl) {
+      cashbackEl.innerHTML = cashbackLabel.replace(" ", "<br />");
+    }
+  
+    if (indexEl) {
+      indexEl.innerHTML = indexLabel.replace(" ", "<br />");
+    }
   }
 
   function renderYearlyTable(quote) {
