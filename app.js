@@ -733,8 +733,9 @@
         ${tableCell(taxSaving, "col-tax")}
   
         ${tableCell(row.livingBenefit)}
-        ${tableCell(row.projectedIndexBenefit)}
         ${tableCell(row.accumulatedLivingBenefit, "col-cashback-cum")}
+        ${tableCell(row.projectedIndexBenefit)}
+        
   
         ${tableCell(row.surrenderIndexBenefit, "col-surrender-detail")}
         ${tableCell(row.surrenderGuaranteed, "col-surrender-detail")}
