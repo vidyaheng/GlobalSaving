@@ -897,7 +897,7 @@ tbody tr:last-child td {
 .field input,
 .field select,
 .field textarea {
-  color: #0f3f7a;
+  color: #2563a8;
   font-weight: 600;
 }
 
@@ -912,7 +912,7 @@ tbody tr:last-child td {
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
-  color: #0f3f7a;
+  color: #2563a8;
   font-weight: 600;
 }
 
