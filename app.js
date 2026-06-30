@@ -652,6 +652,8 @@
     renderQuote(quote);
     
     setTabEnabled("table", true);
+    setTabEnabled("chart", true);
+    
     show($("result-section"));
     activateTab("table");
     
@@ -663,6 +665,158 @@
     });
   }
 
+  function compactChartMoney(value) {
+    const n = Number(value) || 0;
+  
+    if (n >= 1000000) {
+      return `${(n / 1000000).toFixed(1)}ล.`;
+    }
+  
+    if (n >= 100000) {
+      return `${(n / 100000).toFixed(1)}แสน`;
+    }
+  
+    if (n >= 1000) {
+      return `${Math.round(n / 1000)}k`;
+    }
+  
+    return String(Math.round(n));
+  }
+  
+  function renderBenefitChart(quote) {
+    const container = $("benefit-chart");
+    if (!container || !quote?.yearlyTable?.length) return;
+  
+    const rows = quote.yearlyTable;
+  
+    const width = 900;
+    const height = 380;
+  
+    const margin = {
+      top: 28,
+      right: 34,
+      bottom: 46,
+      left: 76
+    };
+  
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+  
+    const allValues = rows.flatMap((row) => [
+      Number(row.cumulativePremiumAfterDiscount) || 0,
+      Number(row.surrenderTotal) || 0,
+      Number(row.deathTotal) || 0
+    ]);
+  
+    const maxValue = Math.max(...allValues, 1);
+    const paddedMax = maxValue * 1.08;
+  
+    const x = (index) => {
+      if (rows.length === 1) return margin.left;
+      return margin.left + (index / (rows.length - 1)) * chartWidth;
+    };
+  
+    const y = (value) => {
+      return margin.top + chartHeight - ((Number(value) || 0) / paddedMax) * chartHeight;
+    };
+  
+    const makePoints = (key) => {
+      return rows
+        .map((row, index) => `${x(index).toFixed(2)},${y(row[key]).toFixed(2)}`)
+        .join(" ");
+    };
+  
+    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+      const value = paddedMax * ratio;
+      const yy = y(value);
+  
+      return `
+        <line
+          class="chart-grid-line"
+          x1="${margin.left}"
+          y1="${yy}"
+          x2="${width - margin.right}"
+          y2="${yy}"
+        ></line>
+        <text
+          class="chart-y-label"
+          x="${margin.left - 12}"
+          y="${yy + 4}"
+          text-anchor="end"
+        >
+          ${compactChartMoney(value)}
+        </text>
+      `;
+    }).join("");
+  
+    const labelStep = Math.ceil(rows.length / 8);
+  
+    const xLabels = rows
+      .map((row, index) => {
+        if (index !== 0 && index !== rows.length - 1 && index % labelStep !== 0) {
+          return "";
+        }
+  
+        return `
+          <text
+            class="chart-x-label"
+            x="${x(index)}"
+            y="${height - 16}"
+            text-anchor="middle"
+          >
+            ปี ${row.policyYear}
+          </text>
+        `;
+      })
+      .join("");
+  
+    container.innerHTML = `
+      <svg
+        class="benefit-svg"
+        viewBox="0 0 ${width} ${height}"
+        role="img"
+        aria-label="กราฟเปรียบเทียบเบี้ยสะสม เวนคืนรวม และเสียชีวิตรวม"
+      >
+        <rect class="chart-bg" x="0" y="0" width="${width}" height="${height}"></rect>
+  
+        ${yTicks}
+  
+        <line
+          class="chart-axis"
+          x1="${margin.left}"
+          y1="${margin.top}"
+          x2="${margin.left}"
+          y2="${height - margin.bottom}"
+        ></line>
+  
+        <line
+          class="chart-axis"
+          x1="${margin.left}"
+          y1="${height - margin.bottom}"
+          x2="${width - margin.right}"
+          y2="${height - margin.bottom}"
+        ></line>
+  
+        <polyline
+          class="chart-line premium"
+          points="${makePoints("cumulativePremiumAfterDiscount")}"
+        ></polyline>
+  
+        <polyline
+          class="chart-line surrender"
+          points="${makePoints("surrenderTotal")}"
+        ></polyline>
+  
+        <polyline
+          class="chart-line death"
+          points="${makePoints("deathTotal")}"
+        ></polyline>
+  
+        ${xLabels}
+      </svg>
+    `;
+  }
+
   // =============================
   // Render quote
   // =============================
@@ -672,6 +826,7 @@
     renderReport(quote);
     renderPayoutOptionLabels(quote);
     renderYearlyTable(quote);
+    renderBenefitChart(quote);
   }
 
   function renderLiveSummary(quote) {
