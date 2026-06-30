@@ -544,19 +544,34 @@
         <div>
           <p class="eyebrow">Chart</p>
           <h2>กราฟผลประโยชน์</h2>
-          <p class="muted">ส่วนนี้เตรียมไว้สำหรับพัฒนากราฟในขั้นต่อไป</p>
+          <p id="chart-note" class="muted">
+            แสดงเบี้ยสะสมเทียบกับผลประโยชน์รวมรายปี
+          </p>
         </div>
       </div>
-    
-      <div class="empty-state">
-        <h3>ยังไม่ได้เปิดใช้งานกราฟ</h3>
-        <p>
-          ตอนนี้ให้ใช้งาน Tab ตารางผลประโยชน์ก่อน
-          หลังจากตารางนิ่งแล้วค่อยเพิ่มกราฟจากข้อมูลเดียวกัน
-        </p>
+      
+      <div class="chart-grid">
+        <section class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <h3>ภาพรวมผลประโยชน์รายปี</h3>
+              <p class="muted">
+                เปรียบเทียบเบี้ยสะสม ผลประโยชน์กรณีเวนคืน และผลประโยชน์กรณีเสียชีวิต
+              </p>
+            </div>
+          </div>
+      
+          <div id="benefit-chart" class="chart-box">
+            กรุณากดคำนวณเพื่อแสดงกราฟ
+          </div>
+      
+          <div class="chart-legend">
+            <span><i class="legend-dot premium"></i> เบี้ยสะสม</span>
+            <span><i class="legend-dot surrender"></i> เวนคืนรวม</span>
+            <span><i class="legend-dot death"></i> เสียชีวิตรวม</span>
+          </div>
+        </section>
       </div>
-    </section>
-  </div>
 
 
   <!-- =========================
