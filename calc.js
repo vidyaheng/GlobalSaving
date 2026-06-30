@@ -71,41 +71,135 @@
     const assumptions = {
       GS_15_8: {
         annualCashbackRate: 0.01,
-
-        // ผลประโยชน์ครบกำหนดสัญญาโดยประมาณจากตัวอย่าง 801% ของทุน
         guaranteedMaturityRate: 8.01,
-
-        // อัตราการจ่ายผลตอบแทนตามดัชนี
+  
+        // กรณีมีชีวิตอยู่
         indexPayoutRates: {
           10: 0.30,
           15: 0.70
         },
-
+  
+        // กรณีเสียชีวิต
+        deathIndexPayoutRates: {
+          1: 0,
+          2: 1.00,
+          3: 1.00,
+          4: 1.00,
+          5: 1.00,
+          6: 1.00,
+          7: 1.00,
+          8: 1.00,
+          9: 1.00,
+          10: 1.00,
+          11: 0.70,
+          12: 0.70,
+          13: 0.70,
+          14: 0.70,
+          15: 0.70
+        },
+  
+        // กรณีเวนคืน
+        surrenderIndexPayoutRates: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
+          9: 0.20,
+          10: 0.30,
+          11: 0.40,
+          12: 0.50,
+          13: 0.60,
+          14: 0.65,
+          15: 0.70
+        },
+  
         indexParticipationRate: 0.90
       },
-
+  
       GS_25_5: {
         annualCashbackRate: 0.01,
-
-        // ผลประโยชน์ครบกำหนดสัญญาโดยประมาณจากตัวอย่าง 501% ของทุน
         guaranteedMaturityRate: 5.01,
-
-        // อัตราการจ่ายผลตอบแทนตามดัชนี
+  
+        // กรณีมีชีวิตอยู่
         indexPayoutRates: {
           10: 0.05,
           15: 0.10,
           20: 0.15,
           25: 0.70
         },
-
+  
+        // กรณีเสียชีวิต
+        deathIndexPayoutRates: {
+          1: 0,
+          2: 1.00,
+          3: 1.00,
+          4: 1.00,
+          5: 1.00,
+          6: 1.00,
+          7: 1.00,
+          8: 1.00,
+          9: 1.00,
+          10: 1.00,
+          11: 0.95,
+          12: 0.95,
+          13: 0.95,
+          14: 0.95,
+          15: 0.95,
+          16: 0.85,
+          17: 0.85,
+          18: 0.85,
+          19: 0.85,
+          20: 0.85,
+          21: 0.70,
+          22: 0.70,
+          23: 0.70,
+          24: 0.70,
+          25: 0.70
+        },
+  
+        // กรณีเวนคืน
+        surrenderIndexPayoutRates: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+          6: 0.01,
+          7: 0.02,
+          8: 0.03,
+          9: 0.04,
+          10: 0.05,
+          11: 0.06,
+          12: 0.07,
+          13: 0.08,
+          14: 0.09,
+          15: 0.10,
+          16: 0.11,
+          17: 0.12,
+          18: 0.13,
+          19: 0.14,
+          20: 0.15,
+          21: 0.30,
+          22: 0.45,
+          23: 0.55,
+          24: 0.65,
+          25: 0.70
+        },
+  
         indexParticipationRate: 0.90
       }
     };
-
+  
     return assumptions[planId] || {
       annualCashbackRate: 0,
       guaranteedMaturityRate: 0,
       indexPayoutRates: {},
+      deathIndexPayoutRates: {},
+      surrenderIndexPayoutRates: {},
       indexParticipationRate: 0.90
     };
   }
@@ -195,6 +289,28 @@
     };
   }
 
+  function getIndexPayoutRate(rateMap, policyYear) {
+    if (!rateMap) return 0;
+    return toNumber(rateMap[policyYear], 0);
+  }
+  
+  function calculateIndexFormulaAmount({
+    policyYear,
+    cumulativePremiumAfterDiscount,
+    assumedIndexReturn,
+    participationRate
+  }) {
+    const r = toNumber(assumedIndexReturn) / 100;
+    const indexGrowth = Math.max(0, Math.pow(1 + r, policyYear) - 1);
+  
+    const benefit =
+      cumulativePremiumAfterDiscount *
+      indexGrowth *
+      participationRate;
+  
+    return roundMoney(benefit);
+  }
+
   // -----------------------------
   // Index-linked projection
   // -----------------------------
@@ -210,21 +326,18 @@
     payoutRate,
     participationRate
   }) {
-    const r = toNumber(assumedIndexReturn) / 100;
-
     if (!payoutRate || payoutRate <= 0) {
       return 0;
     }
-
-    const indexGrowth = Math.max(0, Math.pow(1 + r, policyYear) - 1);
-
-    const benefit =
-      cumulativePremiumAfterDiscount *
-      indexGrowth *
-      participationRate *
-      payoutRate;
-
-    return roundMoney(benefit);
+  
+    const baseIndexBenefit = calculateIndexFormulaAmount({
+      policyYear,
+      cumulativePremiumAfterDiscount,
+      assumedIndexReturn,
+      participationRate
+    });
+  
+    return roundMoney(baseIndexBenefit * payoutRate);
   }
 
   function getYearlyBenefitRate(plan, policyYear) {
@@ -266,6 +379,12 @@
     const indexPayoutRates =
       plan.indexPayoutRates ?? assumptions.indexPayoutRates;
   
+    const deathIndexPayoutRates =
+      plan.deathIndexPayoutRates ?? assumptions.deathIndexPayoutRates;
+  
+    const surrenderIndexPayoutRates =
+      plan.surrenderIndexPayoutRates ?? assumptions.surrenderIndexPayoutRates;
+  
     const indexParticipationRate =
       plan.indexParticipationRate ?? assumptions.indexParticipationRate;
   
@@ -275,9 +394,14 @@
     let cumulativeDiscount = 0;
     let cumulativePremiumAfterDiscount = 0;
   
-    // หมายถึงผลประโยชน์กรณีมีชีวิตอยู่แบบรับเงินจ่ายคืน
-    // รวมเงินคืนรายปี + เงินครบกำหนดในปีสุดท้าย
+    // รวมเงินคืน + เงินครบกำหนด สำหรับ summary กรณีมีชีวิตอยู่
     let cumulativeCashback = 0;
+  
+    // เงินคืนรายปีที่รับมาแล้วจริง ๆ ไม่รวมเงินครบกำหนด
+    let cumulativeReceivedCashback = 0;
+  
+    // ผลตอบแทนดัชนีที่เคยรับมาแล้ว เช่น ปี 10
+    let cumulativeReceivedLivingIndexBenefit = 0;
   
     let cumulativeIndexBenefit = 0;
   
@@ -309,10 +433,6 @@
         cumulativePremiumAfterDiscount + premiumAfterDiscount
       );
   
-      // -----------------------------
-      // Guaranteed benefit from PDF rates
-      // -----------------------------
-  
       const livingBenefit = benefitRateRow
         ? scaleBenefitFromRate(plan, benefitRateRow.livingBenefit, sumAssured)
         : 0;
@@ -337,43 +457,76 @@
           )
         : 0;
   
-      // ปีสุดท้าย livingBenefit คือเงินครบกำหนด/ผลประโยชน์ปลายสัญญา
-      // ปีอื่น ๆ คือเงินจ่ายคืนรายปี
       const annualCashback = isMaturityYear ? 0 : livingBenefit;
       const guaranteedMaturityBenefit = isMaturityYear ? livingBenefit : 0;
   
       cumulativeCashback = roundMoney(cumulativeCashback + livingBenefit);
+      cumulativeReceivedCashback = roundMoney(
+        cumulativeReceivedCashback + annualCashback
+      );
   
-      // -----------------------------
-      // Index-linked projection
-      // -----------------------------
-  
-      const indexPayoutRate = indexPayoutRates[year] || 0;
-  
-      const projectedIndexBenefit = calculateProjectedIndexBenefit({
+      const baseIndexBenefit = calculateIndexFormulaAmount({
         policyYear: year,
         cumulativePremiumAfterDiscount,
         assumedIndexReturn,
-        payoutRate: indexPayoutRate,
         participationRate: indexParticipationRate
       });
+  
+      // กรณีมีชีวิตอยู่
+      const indexPayoutRate = getIndexPayoutRate(indexPayoutRates, year);
+  
+      const projectedIndexBenefit = roundMoney(
+        baseIndexBenefit * indexPayoutRate
+      );
+  
+      // สำคัญ:
+      // ถ้าเสียชีวิต/เวนคืนในปีนี้ จะนับเฉพาะผลตอบแทนดัชนีที่เคยรับมาแล้วก่อนปีนี้
+      // เช่น ปี 11-15 ของ 15/8 จะรวมผลตอบแทนดัชนีที่รับไปแล้วในปี 10
+      const receivedLivingIndexBeforeThisYear =
+        cumulativeReceivedLivingIndexBenefit;
+  
+      const deathIndexPayoutRate = getIndexPayoutRate(
+        deathIndexPayoutRates,
+        year
+      );
+  
+      const surrenderIndexPayoutRate = getIndexPayoutRate(
+        surrenderIndexPayoutRates,
+        year
+      );
+  
+      const deathIndexBenefit = roundMoney(
+        baseIndexBenefit * deathIndexPayoutRate
+      );
+  
+      const surrenderIndexBenefit = roundMoney(
+        baseIndexBenefit * surrenderIndexPayoutRate
+      );
+  
+      const deathTotal = roundMoney(
+        deathGuaranteed +
+          deathIndexBenefit +
+          cumulativeReceivedCashback +
+          receivedLivingIndexBeforeThisYear
+      );
+  
+      const surrenderTotal = roundMoney(
+        surrenderGuaranteed +
+          surrenderIndexBenefit +
+          cumulativeReceivedCashback +
+          receivedLivingIndexBeforeThisYear
+      );
+  
+      const totalBenefitThisYear = roundMoney(
+        livingBenefit + projectedIndexBenefit
+      );
   
       cumulativeIndexBenefit = roundMoney(
         cumulativeIndexBenefit + projectedIndexBenefit
       );
   
-      // ตอนนี้ยังให้ death/surrender index benefit เป็น 0 ก่อน
-      // รอบถัดไปค่อยแยก logic ตาม rate กรณีเสียชีวิต / เวนคืน
-      const deathIndexBenefit = 0;
-      const surrenderIndexBenefit = 0;
-  
-      const deathTotal = roundMoney(deathGuaranteed + deathIndexBenefit);
-      const surrenderTotal = roundMoney(
-        surrenderGuaranteed + surrenderIndexBenefit
-      );
-  
-      const totalBenefitThisYear = roundMoney(
-        livingBenefit + projectedIndexBenefit
+      cumulativeReceivedLivingIndexBenefit = roundMoney(
+        cumulativeReceivedLivingIndexBenefit + projectedIndexBenefit
       );
   
       rows.push({
@@ -388,24 +541,30 @@
         cumulativeDiscount,
         cumulativePremiumAfterDiscount,
   
-        // compatible กับ app.js เดิม
         annualCashback,
         cumulativeCashback,
+        cumulativeReceivedCashback,
+  
         indexPayoutRate,
         projectedIndexBenefit,
         cumulativeIndexBenefit,
+        cumulativeReceivedLivingIndexBenefit,
+  
         guaranteedMaturityBenefit,
         totalBenefitThisYear,
   
-        // fields ใหม่สำหรับตารางแบบ + / −
         livingBenefit,
         accumulatedLivingBenefit,
   
+        baseIndexBenefit,
+  
         deathGuaranteed,
+        deathIndexPayoutRate,
         deathIndexBenefit,
         deathTotal,
   
         surrenderGuaranteed,
+        surrenderIndexPayoutRate,
         surrenderIndexBenefit,
         surrenderTotal
       });
