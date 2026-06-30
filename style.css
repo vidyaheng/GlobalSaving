@@ -880,6 +880,17 @@ tbody tr:last-child td {
 }
 
 /* =========================
+   Data Value Emphasis
+========================= */
+
+.summary-card strong,
+.report-grid strong,
+.report-meta strong {
+  color: #0f3f7a;
+  font-weight: 900;
+}
+
+/* =========================
    Responsive
 ========================= */
 
