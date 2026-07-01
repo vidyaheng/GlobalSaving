@@ -370,7 +370,7 @@
     annualPremiumAfterDiscount,
     discountAmountPerYear,
     assumedIndexReturn,
-    payoutOption = "withdraw"
+    payoutOption = "withdraw",
     taxMode = "none",
     taxRate = 0,
     usedTaxAllowance = 0,
