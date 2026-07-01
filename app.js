@@ -62,6 +62,11 @@
     return el ? el.value : "";
   }
 
+  function getRadioValue(name) {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    return checked ? checked.value : "";
+  }
+
   function setInputValue(id, value) {
     const el = $(id);
     if (el) el.value = value;
@@ -623,7 +628,7 @@
   }
 
   function isTaxIncluded() {
-    return getInputValue("tax-mode") === "include";
+    return getRadioValue("taxMode") === "include";
   }
   
   function syncTaxFieldsVisibility() {
@@ -670,7 +675,7 @@
   // =============================
 
   function collectFormInput() {
-    const taxMode = getInputValue("tax-mode") === "include" ? "include" : "none";
+    const taxMode = getRadioValue("taxMode") === "include" ? "include" : "none";
   
     return {
       planId: getInputValue("plan-id"),
@@ -1214,12 +1219,14 @@
       if (currentQuote) {
         $("quote-form")?.requestSubmit();
       }
-    $("tax-mode")?.addEventListener("change", () => {
-      syncTaxFieldsVisibility();
+    document.querySelectorAll('input[name="taxMode"]').forEach((radio) => {
+      radio.addEventListener("change", () => {
+        syncTaxFieldsVisibility();
     
-      if (currentQuote) {
-        $("quote-form")?.requestSubmit();
-      }
+        if (currentQuote) {
+          $("quote-form")?.requestSubmit();
+        }
+      });
     });
     
     $("tax-rate")?.addEventListener("change", () => {
