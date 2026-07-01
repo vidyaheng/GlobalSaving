@@ -896,8 +896,8 @@
 
     setText("report-total-cashback", money(s.totalCashback));
     setText("report-index-benefit", money(s.totalProjectedIndexBenefit));
-    setText("report-maturity-benefit", money(s.guaranteedMaturityBenefit));
     setText("report-total-benefit", money(s.projectedTotalBenefit));
+    setText("report-irr", irrText(s.irrAtMaturity));
   }
 
   function renderPayoutOptionLabels(quote) {
