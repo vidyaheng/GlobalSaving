@@ -51,7 +51,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -405,39 +406,43 @@ button {
 
 .summary-cards {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .summary-card {
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--surface-soft);
+  padding: 12px 14px;
+  border: 1px solid rgba(203, 213, 225, 0.85);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.035);
 }
 
 .summary-card span {
   display: block;
-  margin-bottom: 6px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 700;
+  margin-bottom: 5px;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 600;
 }
 
 .summary-card strong {
   display: block;
-  font-size: 1.08rem;
-  line-height: 1.35;
+  color: #2563a8;
+  font-size: 0.96rem;
+  font-weight: 650;
+  line-height: 1.3;
   word-break: break-word;
 }
 
 .summary-card.highlight {
-  border-color: rgba(15, 94, 168, 0.25);
-  background: linear-gradient(135deg, #eaf4ff, #ffffff);
+  border-color: rgba(37, 99, 168, 0.25);
+  background: linear-gradient(135deg, #eef6ff, #ffffff);
 }
 
 .summary-card.highlight strong {
-  color: var(--primary-dark);
-  font-size: 1.35rem;
+  color: #0f5ea8;
+  font-size: 1.12rem;
+  font-weight: 800;
 }
 
 /* =========================
@@ -501,61 +506,55 @@ button {
 .print-area {
   padding: 18px;
   background:
-    linear-gradient(180deg, rgba(232, 242, 255, 0.55), rgba(255, 255, 255, 0.95)),
+    linear-gradient(180deg, rgba(232, 242, 255, 0.45), rgba(255, 255, 255, 0.96)),
     #ffffff;
 }
 
 .report-section {
   margin: 16px 0;
-  padding: 24px 26px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: 22px;
   background: #ffffff;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.055);
-}
-
-.report-section:last-child {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
 }
 
 .report-section h3 {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
   color: #0f172a;
 }
 
 .report-section h3::before {
   content: "";
   display: inline-block;
-  width: 8px;
-  height: 24px;
+  width: 7px;
+  height: 22px;
   border-radius: 999px;
   background: var(--primary);
 }
 
 .plan-info-section {
   background:
-    linear-gradient(135deg, rgba(232, 242, 255, 0.72), rgba(255, 255, 255, 1) 42%),
+    linear-gradient(135deg, rgba(232, 242, 255, 0.58), rgba(255, 255, 255, 1) 44%),
     #ffffff;
 }
 
 .benefit-summary-section {
   background:
-    linear-gradient(135deg, rgba(236, 253, 245, 0.74), rgba(255, 255, 255, 1) 46%),
+    linear-gradient(135deg, rgba(236, 253, 245, 0.58), rgba(255, 255, 255, 1) 48%),
     #ffffff;
 }
 
 .yearly-table-section {
   background:
-    linear-gradient(135deg, rgba(255, 247, 237, 0.72), rgba(255, 255, 255, 1) 40%),
+    linear-gradient(135deg, rgba(255, 247, 237, 0.58), rgba(255, 255, 255, 1) 42%),
     #ffffff;
 }
 
 .disclaimer {
   background:
-    linear-gradient(135deg, rgba(241, 245, 249, 0.85), rgba(255, 255, 255, 1)),
+    linear-gradient(135deg, rgba(241, 245, 249, 0.8), rgba(255, 255, 255, 1)),
     #ffffff;
 }
 
@@ -563,47 +562,13 @@ button {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.report-grid > div {
-  background: rgba(255, 255, 255, 0.84);
-}
-
-.report-grid > div:nth-child(4n + 1) {
-  border-top: 4px solid rgba(15, 94, 168, 0.55);
-}
-
-.report-grid > div:nth-child(4n + 2) {
-  border-top: 4px solid rgba(16, 185, 129, 0.50);
-}
-
-.report-grid > div:nth-child(4n + 3) {
-  border-top: 4px solid rgba(245, 158, 11, 0.50);
-}
-
-.report-grid > div:nth-child(4n + 4) {
-  border-top: 4px solid rgba(99, 102, 241, 0.50);
-}
-
-.premium-card {
-  background: #f0f9ff !important;
-  border-color: rgba(15, 94, 168, 0.22) !important;
-}
-
-.premium-card strong {
-  color: var(--primary-dark);
-}
-
-.premium-card.emphasis {
-  background: linear-gradient(135deg, #eaf4ff, #ffffff) !important;
-  border-color: rgba(15, 94, 168, 0.32) !important;
-}
-
 /* =========================
    Result
 ========================= */
 
 .result-section {
-  margin-top: 24px;
-  padding: 26px;
+  margin-top: 20px;
+  padding: 22px;
   border: 1px solid rgba(226, 232, 240, 0.95);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.94);
@@ -615,7 +580,7 @@ button {
   justify-content: space-between;
   gap: 18px;
   align-items: flex-start;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .print-area {
@@ -629,94 +594,116 @@ button {
   display: flex;
   justify-content: space-between;
   gap: 28px;
-  padding: 28px;
+  padding: 24px;
   background:
-    linear-gradient(135deg, rgba(15, 94, 168, 0.12), rgba(15, 94, 168, 0)),
+    linear-gradient(135deg, rgba(15, 94, 168, 0.10), rgba(15, 94, 168, 0)),
     #ffffff;
   border-bottom: 1px solid var(--line);
 }
 
 .report-cover h2 {
   margin: 0 0 8px;
-  font-size: clamp(1.6rem, 3vw, 2.3rem);
-  letter-spacing: -0.05em;
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  letter-spacing: -0.04em;
 }
 
 .report-meta {
-  min-width: 260px;
+  min-width: 300px;
   display: grid;
   gap: 10px;
+  align-content: start;
 }
 
 .report-meta p {
   margin: 0;
-  display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.74);
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.78);
 }
 
 .report-meta span {
-  color: var(--muted);
+  color: #64748b;
+  font-weight: 600;
+  text-align: left;
 }
 
 .report-meta strong {
-  text-align: right;
+  color: #2563a8;
+  font-weight: 750;
+  text-align: left;
+  justify-self: start;
+  white-space: normal;
 }
 
 .report-section {
-  padding: 26px 28px;
-  border-bottom: 1px solid var(--line);
-}
-
-.report-section:last-child {
-  border-bottom: 0;
+  padding: 22px 24px;
 }
 
 .report-section h3 {
   margin: 0 0 16px;
-  font-size: 1.08rem;
+  font-size: 1.05rem;
   letter-spacing: -0.02em;
 }
 
 .report-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .report-grid > div {
-  min-height: 86px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--surface-soft);
+  min-height: 78px;
+  padding: 14px 16px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-top: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
 }
 
 .report-grid span {
   display: block;
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-size: 0.8rem;
-  font-weight: 700;
+  margin-bottom: 7px;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .report-grid strong {
   display: block;
+  color: #2563a8;
+  font-size: 0.98rem;
+  font-weight: 700;
   line-height: 1.35;
   word-break: break-word;
 }
 
-.report-grid .emphasis {
-  border-color: rgba(15, 94, 168, 0.26);
-  background: var(--primary-soft);
+.premium-card {
+  background: #f3f8ff !important;
+  border-color: rgba(37, 99, 168, 0.22) !important;
 }
 
+.premium-card strong {
+  color: #0f5ea8;
+  font-weight: 800;
+}
+
+.premium-card.emphasis,
+.report-grid .emphasis {
+  background: linear-gradient(135deg, #eaf4ff, #ffffff) !important;
+  border-color: rgba(37, 99, 168, 0.32) !important;
+}
+
+.premium-card.emphasis strong,
 .report-grid .emphasis strong {
-  color: var(--primary-dark);
-  font-size: 1.25rem;
+  color: #0b4d94;
+  font-size: 1.22rem;
+  font-weight: 850;
 }
 
 /* =========================
@@ -884,34 +871,41 @@ tbody tr:last-child td {
 ========================= */
 
 .summary-card strong,
-.report-grid strong,
 .report-meta strong {
-  color: #0f3f7a;
-  font-weight: 600;
+  color: #2563a8;
+  font-weight: 650;
+}
+
+.summary-card.highlight strong {
+  color: #0f5ea8;
+  font-weight: 800;
 }
 
 /* =========================
    Form Input Value Emphasis
 ========================= */
 
-.field input,
-.field select,
-.field textarea {
+.quote-form .field input,
+.quote-form .field select,
+.quote-form .field textarea {
   color: #2563a8;
   font-weight: 600;
 }
 
-/* placeholder ยังให้สีอ่อน ไม่แย่งกับค่าจริง */
-.field input::placeholder,
-.field textarea::placeholder {
+.quote-form .field input::placeholder,
+.quote-form .field textarea::placeholder {
   color: #94a3b8;
   font-weight: 400;
 }
 
-/* ตอน focus ให้ยังเป็นน้ำเงินเข้ม */
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
+.quote-form .field input:focus,
+.quote-form .field select:focus,
+.quote-form .field textarea:focus {
+  color: #2563a8;
+  font-weight: 600;
+}
+
+.quote-form .field select option {
   color: #2563a8;
   font-weight: 600;
 }
@@ -1217,11 +1211,11 @@ tbody tr:last-child td {
 
   .result-section {
     margin-top: 16px;
-    padding: 20px;
+    padding: 18px;
   }
 
   .report-cover {
-    padding: 22px;
+    padding: 20px;
   }
 
   .report-section {
@@ -1229,16 +1223,21 @@ tbody tr:last-child td {
   }
 
   .report-grid > div {
-    min-height: 74px;
-    padding: 12px;
+    min-height: 72px;
+    padding: 12px 14px;
   }
 
   .report-grid span {
-    font-size: 0.75rem;
+    font-size: 0.74rem;
   }
 
   .report-grid strong {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+  }
+
+  .premium-card.emphasis strong,
+  .report-grid .emphasis strong {
+    font-size: 1.16rem;
   }
 
   .chart-card {
@@ -1254,7 +1253,7 @@ tbody tr:last-child td {
    Responsive
 ========================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
   .main-layout {
     grid-template-columns: 1fr;
   }
@@ -1310,6 +1309,10 @@ tbody tr:last-child td {
     width: 100%;
   }
 
+  .report-meta p {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
   .report-section,
   .report-cover {
     padding: 20px;
@@ -1344,11 +1347,11 @@ tbody tr:last-child td {
   table {
     min-width: 0;
   }
-  
+
   .benefit-table {
     min-width: 0 !important;
   }
-  
+
   .compact-benefit-table {
     min-width: 720px !important;
   }
@@ -1509,5 +1512,3 @@ tbody tr:last-child td {
     background: #ffffff !important;
   }
 }
-
-
