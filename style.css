@@ -1617,6 +1617,10 @@ tbody tr:last-child td {
   }
 }
 
+/* =========================
+   Tax Radio Controls
+========================= */
+
 .radio-pill-group {
   display: flex;
   gap: 14px;
@@ -1624,8 +1628,8 @@ tbody tr:last-child td {
   flex-wrap: wrap;
 }
 
-.field .radio-pill {
-  display: inline-flex;
+.quote-form .radio-pill {
+  display: inline-flex !important;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
@@ -1641,11 +1645,11 @@ tbody tr:last-child td {
   cursor: pointer;
 }
 
-.field .radio-pill input[type="radio"] {
-  width: 16px;
+.quote-form .radio-pill input[type="radio"] {
+  width: 16px !important;
   min-width: 16px;
-  height: 16px;
-  min-height: 16px;
+  height: 16px !important;
+  min-height: 16px !important;
   margin: 0;
   padding: 0;
   border: 0;
@@ -1656,11 +1660,11 @@ tbody tr:last-child td {
   cursor: pointer;
 }
 
-.field .radio-pill input[type="radio"]:focus {
+.quote-form .radio-pill input[type="radio"]:focus {
   box-shadow: none;
 }
 
-.field .radio-pill:has(input[type="radio"]:checked) {
+.quote-form .radio-pill:has(input[type="radio"]:checked) {
   border-color: rgba(15, 94, 168, 0.45);
   background: var(--primary-soft);
   color: var(--primary-dark);
@@ -1677,7 +1681,15 @@ tbody tr:last-child td {
 }
 
 @media (max-width: 760px) {
-  .radio-pill-group,
+  .radio-pill-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quote-form .radio-pill {
+    width: 100%;
+  }
+
   .tax-extra-fields {
     grid-template-columns: 1fr;
   }
