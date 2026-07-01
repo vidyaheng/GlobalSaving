@@ -204,12 +204,29 @@
                 <small>ใช้กับเงินคืนรายปีและผลตอบแทนดัชนีที่ถึงกำหนดจ่าย</small>
               </div>
   
-              <div class="field">
-                <label for="tax-mode">ภาษี</label>
-                <select id="tax-mode" name="taxMode">
-                  <option value="none">ไม่รวม</option>
-                  <option value="include">รวมลดหย่อน</option>
-                </select>
+              <div class="field field-full">
+                <label>ภาษี</label>
+              
+                <div class="radio-pill-group">
+                  <label class="radio-pill">
+                    <input
+                      type="radio"
+                      name="taxMode"
+                      value="none"
+                      checked
+                    />
+                    <span>ไม่รวม</span>
+                  </label>
+              
+                  <label class="radio-pill">
+                    <input
+                      type="radio"
+                      name="taxMode"
+                      value="include"
+                    />
+                    <span>ลดหย่อน</span>
+                  </label>
+                </div>
               </div>
               
               <div id="tax-extra-fields" class="tax-extra-fields field-full" hidden>
