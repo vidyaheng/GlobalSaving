@@ -857,7 +857,8 @@ tbody tr:last-child td {
 ========================= */
 
 .benefit-main-value strong,
-#report-total-benefit {
+#report-total-benefit,
+.benefit-mini-grid strong {
   display: inline-block;
   white-space: nowrap;
   word-break: keep-all;
@@ -868,7 +869,9 @@ tbody tr:last-child td {
 }
 
 .benefit-mini-grid {
+  display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .benefit-mini-grid strong {
