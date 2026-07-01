@@ -1209,42 +1209,42 @@
   
     $("sum-assured")?.addEventListener("input", updateAutoPremium);
     $("sum-assured")?.addEventListener("blur", enforceMinimumSumAssured);
-    
+  
     $("annual-premium")?.addEventListener("input", updateSumAssuredFromPremium);
     $("annual-premium")?.addEventListener("blur", enforceMinimumPremium);
-    
+  
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
-
+  
     $("payout-option")?.addEventListener("change", () => {
       if (currentQuote) {
         $("quote-form")?.requestSubmit();
       }
+    });
+  
     document.querySelectorAll('input[name="taxMode"]').forEach((radio) => {
       radio.addEventListener("change", () => {
         syncTaxFieldsVisibility();
-    
+  
         if (currentQuote) {
           $("quote-form")?.requestSubmit();
         }
       });
     });
-    
+  
     $("tax-rate")?.addEventListener("change", () => {
       if (currentQuote) {
         $("quote-form")?.requestSubmit();
       }
     });
-    
+  
     $("used-tax-allowance")?.addEventListener("input", () => {
       if (currentQuote) {
         $("quote-form")?.requestSubmit();
       }
     });
-    });
-    
   
     // addAutoFormatNumber("sum-assured"); ปิดการแสดงค่าเป็นจำนวนเต็มไว้ก่อน ต้องการแสดงเป็น ทศนิยม
-
+  
     setupBenefitTableToggles();
   
     bindTabEvents();
