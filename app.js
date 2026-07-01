@@ -204,6 +204,30 @@
     return value || "-";
   }
 
+  function planTitleEn(summary) {
+    if (summary.planId === "GS_15_8") {
+      return "Global Saving Plus 15/8 (Index-Linked)";
+    }
+  
+    if (summary.planId === "GS_25_5") {
+      return "Global Saving Plus 25/5 (Index-Linked)";
+    }
+  
+    return summary.displayName || summary.planName || "Global Saving Plus";
+  }
+  
+  function planTitleTh(summary) {
+    if (summary.planId === "GS_15_8") {
+      return "โกลบอล เซฟวิ่งส์ พลัส 15/8 (อินเด็กซ์ ลิงค์)";
+    }
+  
+    if (summary.planId === "GS_25_5") {
+      return "โกลบอล เซฟวิ่งส์ พลัส 25/5 (อินเด็กซ์ ลิงค์)";
+    }
+  
+    return "โกลบอล เซฟวิ่งส์ พลัส";
+  }
+
   function todayText() {
     return new Date().toLocaleDateString("th-TH", {
       year: "numeric",
@@ -844,7 +868,8 @@
     const s = quote.summary;
     const meta = quote.meta || {};
 
-    setText("report-title", s.displayName || s.planName || "Global Saving");
+    setText("report-title", planTitleEn(s));
+    setText("report-title-th", planTitleTh(s));
     setText(
       "report-subtitle",
       `ทุนประกัน ${money(s.sumAssured)} | ชำระเบี้ย ${s.premiumPayYears} ปี | คุ้มครอง ${s.coverageYears} ปี`
