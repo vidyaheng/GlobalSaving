@@ -88,6 +88,16 @@
     return `${(n * 100).toFixed(2)}%`;
   }
 
+  function irrText(value) {
+    const n = Number(value);
+  
+    if (!Number.isFinite(n)) {
+      return "-";
+    }
+  
+    return `${(n * 100).toFixed(2)}% ต่อปี`;
+  }
+
   function formatInputNumber(value) {
   const n = Number(value) || 0;
   const rounded = Math.round((n + Number.EPSILON) * 100) / 100;
