@@ -673,13 +673,14 @@
     currentQuote = quote;
 
     showFormErrors([]);
-    renderQuote(quote);
-    
+
     setTabEnabled("table", true);
     setTabEnabled("chart", true);
     
     show($("result-section"));
     activateTab("table");
+    
+    renderQuote(quote);
     
     writeLog("calculate_quote", {
       planId: quote.summary.planId,
