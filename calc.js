@@ -371,6 +371,10 @@
     discountAmountPerYear,
     assumedIndexReturn,
     payoutOption = "withdraw"
+    taxMode = "none",
+    taxRate = 0,
+    usedTaxAllowance = 0,
+    taxAllowanceCap = 100000
   }) {
     const assumptions = getDefaultPlanAssumptions(plan.id);
   
@@ -391,6 +395,17 @@
   
     const shouldAccumulatePayouts = payoutOption === "accumulate";
     const depositInterestRate = 0.005;
+
+    const shouldIncludeTax = taxMode === "include";
+    const annualTaxCap = toNumber(taxAllowanceCap, 100000) || 100000;
+    const usedAllowance = Math.max(0, toNumber(usedTaxAllowance, 0));
+    const remainingTaxAllowance = shouldIncludeTax
+      ? Math.max(0, annualTaxCap - usedAllowance)
+      : 0;
+    
+    const taxRateDecimal = shouldIncludeTax
+      ? Math.max(0, toNumber(taxRate, 0)) / 100
+      : 0;
   
     const rows = [];
   
@@ -415,6 +430,8 @@
   
     // รวมผลตอบแทนดัชนีกรณีมีชีวิตอยู่ สำหรับ summary
     let cumulativeIndexBenefit = 0;
+
+    let cumulativeTaxSaving = 0;
   
     for (let year = 1; year <= coverageYears; year++) {
       const isPremiumPayYear = year <= premiumPayYears;
@@ -432,6 +449,17 @@
   
       const premiumAfterDiscount = isPremiumPayYear
         ? roundMoney(annualPremiumAfterDiscount)
+        : 0;
+
+      const taxDeductiblePremium =
+        shouldIncludeTax && isPremiumPayYear
+          ? roundMoney(Math.min(premiumAfterDiscount, remainingTaxAllowance))
+          : 0;
+      
+      const taxSaving = roundMoney(taxDeductiblePremium * taxRateDecimal);
+      
+      const taxValueForTotal = shouldIncludeTax
+        ? roundMoney(cumulativeTaxSaving + taxSaving)
         : 0;
   
       cumulativePremiumBeforeDiscount = roundMoney(
@@ -518,18 +546,20 @@
         deathGuaranteed +
           deathIndexBenefit +
           priorCashbackValue +
-          priorIndexValue
+          priorIndexValue +
+          taxValueForTotal
       );
-  
+      
       const surrenderTotal = roundMoney(
         surrenderGuaranteed +
           surrenderIndexBenefit +
           priorCashbackValue +
-          priorIndexValue
+          priorIndexValue +
+          taxValueForTotal
       );
   
       const totalBenefitThisYear = roundMoney(
-        livingBenefit + projectedIndexBenefit
+        livingBenefit + projectedIndexBenefit + taxSaving
       );
   
       // อัปเดตยอดหลังจบปีนี้ สำหรับใช้แสดงใน row และใช้เป็น prior ของปีถัดไป
@@ -563,6 +593,8 @@
       const carriedIndexValue = shouldAccumulatePayouts
         ? accumulatedLivingIndexBenefitBalance
         : cumulativeReceivedLivingIndexBenefit;
+
+      cumulativeTaxSaving = taxValueForTotal;
   
       rows.push({
         policyYear: year,
@@ -571,6 +603,15 @@
         premiumBeforeDiscount,
         discountAmount,
         premiumAfterDiscount,
+
+        taxMode,
+        shouldIncludeTax,
+        taxAllowanceCap: annualTaxCap,
+        usedTaxAllowance: usedAllowance,
+        remainingTaxAllowance,
+        taxDeductiblePremium,
+        taxSaving,
+        cumulativeTaxSaving,
   
         cumulativePremiumBeforeDiscount,
         cumulativeDiscount,
@@ -670,7 +711,7 @@
     return (low + high) / 2;
   }
   
-  function buildIrrCashflows({ yearlyTable, payoutOption }) {
+  function buildIrrCashflows({ yearlyTable, payoutOption, taxMode = "none" }) {
     if (!Array.isArray(yearlyTable) || yearlyTable.length === 0) {
       return [];
     }
@@ -691,6 +732,9 @@
           : 0;
   
       let inflow = 0;
+
+      const taxSaving =
+        taxMode === "include" ? Number(row.taxSaving) || 0 : 0;
   
       if (payoutOption === "accumulate") {
         // ฝากสะสม: ไม่รับเงินระหว่างทาง รับยอดสะสมทั้งหมดตอนครบสัญญา
@@ -716,7 +760,7 @@
           (Number(row.projectedIndexBenefit) || 0);
       }
   
-      cashflows.push(roundMoney(inflow - nextPremium));
+      cashflows.push(roundMoney(inflow + taxSaving - nextPremium));
     });
   
     return cashflows;
@@ -742,7 +786,15 @@
     const sumAssured = toNumber(input.sumAssured);
     const annualPremiumBeforeDiscount = calculateBaseAnnualPremium(plan, sumAssured);
     const assumedIndexReturn = toNumber(input.assumedIndexReturn, 0);
-    const taxRate = toNumber(input.taxRate, 0);
+    const taxMode = input.taxMode === "include" ? "include" : "none";
+    const taxRate = taxMode === "include" ? toNumber(input.taxRate, 0) : 0;
+    const taxAllowanceCap = 100000;
+    const usedTaxAllowance =
+      taxMode === "include" ? Math.max(0, toNumber(input.usedTaxAllowance, 0)) : 0;
+    const remainingTaxAllowance =
+      taxMode === "include"
+        ? Math.max(0, taxAllowanceCap - usedTaxAllowance)
+        : 0;
 
     const payoutOption =
       input.payoutOption === "accumulate" ? "accumulate" : "withdraw";
@@ -773,19 +825,24 @@
       annualPremiumAfterDiscount: discount.premiumAfterDiscount,
       discountAmountPerYear: discount.discountAmount,
       assumedIndexReturn,
-      payoutOption
+      payoutOption,
+      taxMode,
+      taxRate,
+      usedTaxAllowance,
+      taxAllowanceCap
     });
 
     const finalRow = yearlyTable[yearlyTable.length - 1];
 
     const irrCashflows = buildIrrCashflows({
       yearlyTable,
-      payoutOption
+      payoutOption,
+      taxMode
     });
     
     const irrAtMaturity = calculateIrr(irrCashflows);
     
-    const projectedTotalBenefit =
+    const policyProjectedTotalBenefit =
       payoutOption === "accumulate"
         ? roundMoney(
             (Number(finalRow.carriedCashbackValue) ||
@@ -801,6 +858,13 @@
             (Number(finalRow.cumulativeCashback) || 0) +
               (Number(finalRow.cumulativeIndexBenefit) || 0)
           );
+    
+    const totalTaxSaving =
+      taxMode === "include" ? Number(finalRow.cumulativeTaxSaving) || 0 : 0;
+    
+    const projectedTotalBenefit = roundMoney(
+      policyProjectedTotalBenefit + totalTaxSaving
+    );
 
     const summary = {
       planId: plan.id,
@@ -828,7 +892,17 @@
       totalPremiumAfterDiscount,
 
       assumedIndexReturn,
-      taxRate,
+
+        taxMode,
+        taxRate,
+        taxAllowanceCap,
+        usedTaxAllowance,
+        remainingTaxAllowance,
+        annualTaxDeductiblePremium:
+          yearlyTable.find((row) => row.premiumAfterDiscount > 0)?.taxDeductiblePremium || 0,
+        annualTaxSaving:
+          yearlyTable.find((row) => row.premiumAfterDiscount > 0)?.taxSaving || 0,
+        totalTaxSaving,
 
       payoutOption,
       payoutOptionLabel:
@@ -841,6 +915,7 @@
       totalProjectedIndexBenefit: finalRow.cumulativeIndexBenefit,
       guaranteedMaturityBenefit: finalRow.guaranteedMaturityBenefit,
 
+      policyProjectedTotalBenefit,
       projectedTotalBenefit,
       irrAtMaturity,
       irrCashflows
@@ -900,6 +975,10 @@
       "ส่วนลด": row.discountAmount,
       "เบี้ยหลังส่วนลด": row.premiumAfterDiscount,
       "เบี้ยสะสมหลังส่วนลด": row.cumulativePremiumAfterDiscount,
+
+      "ลดหย่อนได้": row.taxDeductiblePremium || 0,
+      "ประหยัดภาษี": row.taxSaving || 0,
+      "ประหยัดภาษีสะสม": row.cumulativeTaxSaving || 0,
   
       "เงินคืน": row.livingBenefit,
       "เงินคืนสะสม/รับแล้ว": row.carriedCashbackValue,
