@@ -621,11 +621,56 @@
     });
   }
 
+  function isTaxIncluded() {
+    return getInputValue("tax-mode") === "include";
+  }
+  
+  function syncTaxFieldsVisibility() {
+    const box = $("tax-extra-fields");
+  
+    if (!box) return;
+  
+    if (isTaxIncluded()) {
+      show(box);
+    } else {
+      hide(box);
+    }
+  }
+  
+  function renderTaxDisplayState(quote) {
+    const taxIncluded = quote?.summary?.taxMode === "include";
+    const table = $("yearly-table");
+    const taxButton = document.querySelector('[data-toggle-column="tax"]');
+  
+    if (table) {
+      table.classList.toggle("show-tax", taxIncluded);
+    }
+  
+    if (taxButton) {
+      taxButton.hidden = !taxIncluded;
+      taxButton.textContent = table?.classList.contains("show-tax")
+        ? "ซ่อน ▾"
+        : "ลดหย่อน ▸";
+    }
+  
+    setText(
+      "report-total-benefit-label",
+      taxIncluded ? "ผลรวมหลังภาษี" : "ผลประโยชน์รวม"
+    );
+  
+    setText(
+      "report-irr-label",
+      taxIncluded ? "IRR หลังภาษี" : "IRR เมื่อครบสัญญา"
+    );
+  }
+
   // =============================
   // Form
   // =============================
 
   function collectFormInput() {
+    const taxMode = getInputValue("tax-mode") === "include" ? "include" : "none";
+  
     return {
       planId: getInputValue("plan-id"),
       gender: getInputValue("gender"),
@@ -633,9 +678,13 @@
       sumAssured: getInputValue("sum-assured"),
       annualPremium: getInputValue("annual-premium"),
       assumedIndexReturn: getInputValue("assumed-index-return"),
-      taxRate: getInputValue("tax-rate"),
       payoutOption: getInputValue("payout-option"),
-
+  
+      taxMode,
+      taxRate: taxMode === "include" ? getInputValue("tax-rate") : 0,
+      usedTaxAllowance:
+        taxMode === "include" ? getInputValue("used-tax-allowance") : 0,
+  
       customerName: getInputValue("customer-name").trim(),
       advisorName: getInputValue("advisor-name").trim()
     };
