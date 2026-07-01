@@ -1388,6 +1388,98 @@ tbody tr:last-child td {
 }
 
 /* =========================
+   Report Hero Fine Tune
+   ลดขนาดตัวอักษร และลดความหนา
+========================= */
+
+.report-title-block h2 {
+  margin: 0 0 4px;
+  color: #1f2aa8;
+  font-size: clamp(1.18rem, 1.6vw, 1.55rem);
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.report-plan-line {
+  margin: 0;
+  color: #e11d48;
+  font-size: clamp(0.98rem, 1.45vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.report-code-pill {
+  margin-left: 6px;
+  padding: 2px 8px;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+/* ฝั่งลูกค้า / เพศ / อายุ / วันที่ / ผู้เสนอ */
+.report-client-block {
+  width: min(320px, 100%);
+  gap: 4px;
+}
+
+.client-row {
+  grid-template-columns: 82px 1fr;
+  gap: 10px;
+  padding: 2px 0;
+  align-items: baseline;
+}
+
+.client-row span {
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.client-row strong {
+  color: #0f3f7a;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.customer-row strong {
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+/* เส้นคั่นลดระยะลง */
+.hero-accent-line {
+  margin: 18px 0 18px;
+}
+
+/* ตัวเลขข้อมูลแผน */
+.plan-metric-grid {
+  gap: 18px 28px;
+}
+
+.plan-metric span {
+  margin-bottom: 4px;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.plan-metric strong {
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.28;
+}
+
+/* ตัวหลัก เช่น ทุนประกัน / เบี้ยต่อปี ไม่ให้ใหญ่และไม่หนาเกิน */
+.plan-metric.major strong {
+  color: #003b76;
+  font-size: clamp(1.08rem, 1.5vw, 1.25rem);
+  font-weight: 500;
+}
+
+/* =========================
    Clean Benefit Summary
 ========================= */
 
