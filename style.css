@@ -1618,84 +1618,6 @@ tbody tr:last-child td {
 }
 
 /* =========================
-   Tax Radio Controls
-========================= */
-
-.radio-pill-group {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.quote-form .radio-pill {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-  width: auto;
-  min-height: 42px;
-  margin: 0;
-  padding: 8px 12px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: #ffffff;
-  color: #334155;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.quote-form .radio-pill input[type="radio"] {
-  width: 16px !important;
-  min-width: 16px;
-  height: 16px !important;
-  min-height: 16px !important;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  box-shadow: none;
-  accent-color: var(--primary);
-  cursor: pointer;
-}
-
-.quote-form .radio-pill input[type="radio"]:focus {
-  box-shadow: none;
-}
-
-.quote-form .radio-pill:has(input[type="radio"]:checked) {
-  border-color: rgba(15, 94, 168, 0.45);
-  background: var(--primary-soft);
-  color: var(--primary-dark);
-}
-
-.tax-extra-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.tax-extra-fields[hidden] {
-  display: none !important;
-}
-
-@media (max-width: 760px) {
-  .radio-pill-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .quote-form .radio-pill {
-    width: 100%;
-  }
-
-  .tax-extra-fields {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =========================
    Responsive
 ========================= */
 
@@ -1800,6 +1722,97 @@ tbody tr:last-child td {
 
   .compact-benefit-table {
     min-width: 720px !important;
+  }
+}
+
+/* =========================
+   Tax Radio Force Fix
+========================= */
+
+.quote-form .radio-pill-group {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 18px !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+.quote-form .radio-pill-group > label.radio-pill {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 40px !important;
+
+  margin: 0 !important;
+  padding: 8px 12px !important;
+
+  border: 1px solid var(--line) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+
+  cursor: pointer !important;
+}
+
+.quote-form .radio-pill-group > label.radio-pill > input[type="radio"] {
+  appearance: auto !important;
+  -webkit-appearance: radio !important;
+
+  display: inline-block !important;
+  position: static !important;
+
+  width: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  opacity: 1 !important;
+  pointer-events: auto !important;
+
+  accent-color: var(--primary) !important;
+  flex: 0 0 16px !important;
+}
+
+.quote-form .radio-pill-group > label.radio-pill > span {
+  display: inline-block !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+.quote-form .radio-pill-group > label.radio-pill:has(input[type="radio"]:checked) {
+  border-color: rgba(15, 94, 168, 0.45) !important;
+  background: var(--primary-soft) !important;
+  color: var(--primary-dark) !important;
+}
+
+@media (max-width: 760px) {
+  .quote-form .radio-pill-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .quote-form .radio-pill-group > label.radio-pill {
+    width: 100% !important;
   }
 }
 
