@@ -853,6 +853,36 @@ tbody tr:last-child td {
 }
 
 /* =========================
+   Benefit Summary Fine Tune
+========================= */
+
+.benefit-main-value strong,
+#report-total-benefit {
+  display: inline-block;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+.benefit-main-value {
+  overflow-x: auto;
+}
+
+.benefit-mini-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.benefit-mini-grid strong {
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+@media (max-width: 760px) {
+  .benefit-mini-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
    Disclaimer
 ========================= */
 
