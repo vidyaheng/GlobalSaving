@@ -202,10 +202,11 @@
   }
   
   function calculateTaxSaving(row, quote) {
-    const taxRate = Number(quote?.summary?.taxRate) || 0;
-    const premium = Number(row.premiumAfterDiscount) || 0;
+    if (quote?.summary?.taxMode !== "include") {
+      return 0;
+    }
   
-    return Math.round(((premium * taxRate) / 100 + Number.EPSILON) * 100) / 100;
+    return Number(row.taxSaving) || 0;
   }
 
   function thaiGender(value) {
@@ -909,6 +910,7 @@
     renderLiveSummary(quote);
     renderReport(quote);
     renderPayoutOptionLabels(quote);
+    renderTaxDisplayState(quote);
     renderYearlyTable(quote);
     renderBenefitChart(quote);
   }
@@ -1212,6 +1214,25 @@
       if (currentQuote) {
         $("quote-form")?.requestSubmit();
       }
+    $("tax-mode")?.addEventListener("change", () => {
+      syncTaxFieldsVisibility();
+    
+      if (currentQuote) {
+        $("quote-form")?.requestSubmit();
+      }
+    });
+    
+    $("tax-rate")?.addEventListener("change", () => {
+      if (currentQuote) {
+        $("quote-form")?.requestSubmit();
+      }
+    });
+    
+    $("used-tax-allowance")?.addEventListener("input", () => {
+      if (currentQuote) {
+        $("quote-form")?.requestSubmit();
+      }
+    });
     });
     
   
@@ -1225,6 +1246,7 @@
   function init() {
     populatePlanSelect();
     applyPlanDefaults();
+    syncTaxFieldsVisibility();
     bindEvents();
     renderAuthState();
 
