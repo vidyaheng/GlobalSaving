@@ -617,6 +617,111 @@
     return rows;
   }
 
+  function calculateNpv(rate, cashflows) {
+    return cashflows.reduce((sum, cashflow, index) => {
+      return sum + cashflow / Math.pow(1 + rate, index);
+    }, 0);
+  }
+  
+  function calculateIrr(cashflows) {
+    const values = cashflows.map((value) => Number(value) || 0);
+  
+    const hasPositive = values.some((value) => value > 0);
+    const hasNegative = values.some((value) => value < 0);
+  
+    if (!hasPositive || !hasNegative) {
+      return null;
+    }
+  
+    let low = -0.999999;
+    let high = 1;
+  
+    let lowNpv = calculateNpv(low, values);
+    let highNpv = calculateNpv(high, values);
+  
+    let guard = 0;
+  
+    while (lowNpv * highNpv > 0 && high < 1000 && guard < 80) {
+      high *= 2;
+      highNpv = calculateNpv(high, values);
+      guard += 1;
+    }
+  
+    if (lowNpv * highNpv > 0) {
+      return null;
+    }
+  
+    for (let i = 0; i < 100; i++) {
+      const mid = (low + high) / 2;
+      const midNpv = calculateNpv(mid, values);
+  
+      if (Math.abs(midNpv) < 0.000001) {
+        return mid;
+      }
+  
+      if (lowNpv * midNpv > 0) {
+        low = mid;
+        lowNpv = midNpv;
+      } else {
+        high = mid;
+      }
+    }
+  
+    return (low + high) / 2;
+  }
+  
+  function buildIrrCashflows({ yearlyTable, payoutOption }) {
+    if (!Array.isArray(yearlyTable) || yearlyTable.length === 0) {
+      return [];
+    }
+  
+    const finalIndex = yearlyTable.length - 1;
+    const finalRow = yearlyTable[finalIndex];
+  
+    const cashflows = [];
+  
+    // t=0: จ่ายเบี้ยปีแรก
+    cashflows.push(-(Number(yearlyTable[0].premiumAfterDiscount) || 0));
+  
+    yearlyTable.forEach((row, index) => {
+      // เบี้ยปีถัดไป ถือว่าจ่ายตอนต้นปีถัดไป / ปลายปีปัจจุบัน
+      const nextPremium =
+        index + 1 < yearlyTable.length
+          ? Number(yearlyTable[index + 1].premiumAfterDiscount) || 0
+          : 0;
+  
+      let inflow = 0;
+  
+      if (payoutOption === "accumulate") {
+        // ฝากสะสม: ไม่รับเงินระหว่างทาง รับยอดสะสมทั้งหมดตอนครบสัญญา
+        if (index === finalIndex) {
+          const finalCashback =
+            Number(finalRow.carriedCashbackValue) ||
+            Number(finalRow.accumulatedLivingBenefit) ||
+            Number(finalRow.cumulativeCashback) ||
+            0;
+  
+          const finalIndexBenefit =
+            Number(finalRow.carriedIndexValue) ||
+            Number(finalRow.cumulativeReceivedLivingIndexBenefit) ||
+            Number(finalRow.cumulativeIndexBenefit) ||
+            0;
+  
+          inflow = finalCashback + finalIndexBenefit;
+        }
+      } else {
+        // รับออก: รับเงินคืนและผลตอบแทนดัชนีตามปีที่ถึงกำหนด
+        inflow =
+          (Number(row.livingBenefit) || 0) +
+          (Number(row.projectedIndexBenefit) || 0);
+      }
+  
+      cashflows.push(roundMoney(inflow - nextPremium));
+    });
+  
+    return cashflows;
+  }
+
   // -----------------------------
   // Main quote calculation
   // -----------------------------
@@ -673,6 +778,30 @@
 
     const finalRow = yearlyTable[yearlyTable.length - 1];
 
+    const irrCashflows = buildIrrCashflows({
+      yearlyTable,
+      payoutOption
+    });
+    
+    const irrAtMaturity = calculateIrr(irrCashflows);
+    
+    const projectedTotalBenefit =
+      payoutOption === "accumulate"
+        ? roundMoney(
+            (Number(finalRow.carriedCashbackValue) ||
+              Number(finalRow.accumulatedLivingBenefit) ||
+              Number(finalRow.cumulativeCashback) ||
+              0) +
+              (Number(finalRow.carriedIndexValue) ||
+                Number(finalRow.cumulativeReceivedLivingIndexBenefit) ||
+                Number(finalRow.cumulativeIndexBenefit) ||
+                0)
+          )
+        : roundMoney(
+            (Number(finalRow.cumulativeCashback) || 0) +
+              (Number(finalRow.cumulativeIndexBenefit) || 0)
+          );
+
     const summary = {
       planId: plan.id,
       productName: plan.productName || "Global Saving",
@@ -712,9 +841,9 @@
       totalProjectedIndexBenefit: finalRow.cumulativeIndexBenefit,
       guaranteedMaturityBenefit: finalRow.guaranteedMaturityBenefit,
 
-      projectedTotalBenefit: roundMoney(
-        finalRow.cumulativeCashback + finalRow.cumulativeIndexBenefit
-      )
+      projectedTotalBenefit,
+      irrAtMaturity,
+      irrCashflows
     };
 
     return {
