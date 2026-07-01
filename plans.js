@@ -1,13 +1,13 @@
 // plans.js
-// ข้อมูลหลักของแผน Global Saving
+// ข้อมูลหลักของแผน Global Saving Plus
 // เก็บเฉพาะข้อมูล config ของแผน ไม่ใส่ logic คำนวณในไฟล์นี้
 
 const PLANS = {
   GS_15_8: {
     id: "GS_15_8",
-    productName: "Global Saving",
-    planName: "Global Saving 15/8",
-    displayName: "Global Saving 15/8",
+    productName: "Global Saving Plus",
+    planName: "Global Saving Plus 15/8",
+    displayName: "Global Saving Plus 15/8",
     code: "E15G8A",
 
     coverageYears: 15,
@@ -48,7 +48,7 @@ const PLANS = {
     currency: "THB",
     paymentMode: "รายปี",
 
-    description: "แผน Global Saving ระยะคุ้มครอง 15 ปี ชำระเบี้ย 8 ปี",
+    description: "แผน Global Saving Plus ระยะคุ้มครอง 15 ปี ชำระเบี้ย 8 ปี",
 
     indexReturnYears: [10, 15],
 
@@ -66,9 +66,9 @@ const PLANS = {
 
   GS_25_5: {
     id: "GS_25_5",
-    productName: "Global Saving",
-    planName: "Global Saving 25/5",
-    displayName: "Global Saving 25/5",
+    productName: "Global Saving Plus",
+    planName: "Global Saving Plus 25/5",
+    displayName: "Global Saving Plus 25/5",
     code: "E25G5A",
 
     coverageYears: 25,
@@ -115,7 +115,7 @@ const PLANS = {
     currency: "THB",
     paymentMode: "รายปี",
 
-    description: "แผน Global Saving ระยะคุ้มครอง 25 ปี ชำระเบี้ย 5 ปี",
+    description: "แผน Global Saving Plus ระยะคุ้มครอง 25 ปี ชำระเบี้ย 5 ปี",
 
     indexReturnYears: [10, 15, 20, 25],
 
