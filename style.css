@@ -1729,7 +1729,7 @@ tbody tr:last-child td {
    Tax Radio Force Fix
 ========================= */
 
-.quote-form .radio-pill-group {
+.quote-form .tax-radio-group {
   display: flex !important;
   flex-direction: row !important;
   gap: 18px !important;
@@ -1737,7 +1737,7 @@ tbody tr:last-child td {
   flex-wrap: wrap !important;
 }
 
-.quote-form .radio-pill-group > label.radio-pill {
+.quote-form .tax-radio-group > label.tax-radio {
   display: inline-flex !important;
   flex-direction: row !important;
   align-items: center !important;
@@ -1763,7 +1763,7 @@ tbody tr:last-child td {
   cursor: pointer !important;
 }
 
-.quote-form .radio-pill-group > label.radio-pill > input[type="radio"] {
+.quote-form .tax-radio-group > label.tax-radio > input[type="radio"] {
   appearance: auto !important;
   -webkit-appearance: radio !important;
 
@@ -1793,25 +1793,25 @@ tbody tr:last-child td {
   flex: 0 0 16px !important;
 }
 
-.quote-form .radio-pill-group > label.radio-pill > span {
+.quote-form .tax-radio-group > label.tax-radio > span {
   display: inline-block !important;
   margin: 0 !important;
   white-space: nowrap !important;
 }
 
-.quote-form .radio-pill-group > label.radio-pill:has(input[type="radio"]:checked) {
+.quote-form .tax-radio-group > label.tax-radio:has(input[type="radio"]:checked) {
   border-color: rgba(15, 94, 168, 0.45) !important;
   background: var(--primary-soft) !important;
   color: var(--primary-dark) !important;
 }
 
 @media (max-width: 760px) {
-  .quote-form .radio-pill-group {
+  .quote-form .tax-radio-group {
     flex-direction: column !important;
     align-items: stretch !important;
   }
 
-  .quote-form .radio-pill-group > label.radio-pill {
+  .quote-form .tax-radio-group > label.tax-radio {
     width: 100% !important;
   }
 }
