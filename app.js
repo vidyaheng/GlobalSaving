@@ -792,33 +792,62 @@
   
     return String(Math.round(n));
   }
+
+  function chartIrrText(value) {
+    const n = Number(value);
+  
+    if (!Number.isFinite(n) || n <= 0) {
+      return "-";
+    }
+  
+    return `${(n * 100).toFixed(2)}%`;
+  }
+  
+  function clampIndex(value, max) {
+    return Math.max(0, Math.min(Number(value) || 0, max));
+  }
   
   function renderBenefitChart(quote) {
     const container = $("benefit-chart");
     if (!container || !quote?.yearlyTable?.length) return;
   
     const rows = quote.yearlyTable;
+    const finalIndex = rows.length - 1;
   
-    const width = 900;
-    const height = 380;
+    let selectedIndex = clampIndex(
+      Number(container.dataset.selectedIndex ?? finalIndex),
+      finalIndex
+    );
+  
+    const selectedRow = rows[selectedIndex];
+    const summary = quote.summary || {};
+  
+    const width = 920;
+    const height = 420;
   
     const margin = {
-      top: 28,
+      top: 40,
       right: 34,
       bottom: 46,
-      left: 76
+      left: 74
     };
   
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
   
-    const allValues = rows.flatMap((row) => [
-      Number(row.cumulativePremiumAfterDiscount) || 0,
-      Number(row.surrenderTotal) || 0,
-      Number(row.deathTotal) || 0
-    ]);
+    const deathColor = "#2f80ed";
+    const surrenderColor = "#f59e0b";
+    const premiumColor = "#0a8a0a";
   
-    const maxValue = Math.max(...allValues, 1);
+    const maxValue = Math.max(
+      ...rows.flatMap((row) => [
+        Number(row.deathTotal) || 0,
+        Number(row.surrenderTotal) || 0,
+        Number(row.cumulativePremiumAfterDiscount) || 0
+      ]),
+      1
+    );
+  
     const paddedMax = maxValue * 1.08;
   
     const x = (index) => {
@@ -827,7 +856,11 @@
     };
   
     const y = (value) => {
-      return margin.top + chartHeight - ((Number(value) || 0) / paddedMax) * chartHeight;
+      return (
+        margin.top +
+        chartHeight -
+        ((Number(value) || 0) / paddedMax) * chartHeight
+      );
     };
   
     const makePoints = (key) => {
@@ -836,30 +869,49 @@
         .join(" ");
     };
   
-    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-      const value = paddedMax * ratio;
-      const yy = y(value);
+    const selectedX = x(selectedIndex);
+    const selectedDeathY = y(selectedRow.deathTotal);
+    const selectedSurrenderY = y(selectedRow.surrenderTotal);
+    const selectedPremiumY = y(selectedRow.cumulativePremiumAfterDiscount);
   
-      return `
-        <line
-          class="chart-grid-line"
-          x1="${margin.left}"
-          y1="${yy}"
-          x2="${width - margin.right}"
-          y2="${yy}"
-        ></line>
-        <text
-          class="chart-y-label"
-          x="${margin.left - 12}"
-          y="${yy + 4}"
-          text-anchor="end"
-        >
-          ${compactChartMoney(value)}
-        </text>
-      `;
-    }).join("");
+    const selectedAge = selectedRow.age;
+    const selectedYear = selectedRow.policyYear;
   
-    const labelStep = Math.ceil(rows.length / 8);
+    const surrenderIrr =
+      window.GSCalc &&
+      typeof GSCalc.calculateSurrenderIrrAtYear === "function"
+        ? GSCalc.calculateSurrenderIrrAtYear(quote, selectedIndex)
+        : null;
+  
+    const irrLabel = chartIrrText(surrenderIrr);
+  
+    const yTicks = [0, 0.25, 0.5, 0.75, 1]
+      .map((ratio) => {
+        const value = paddedMax * ratio;
+        const yy = y(value);
+  
+        return `
+          <line
+            class="gs-chart-grid-line"
+            x1="${margin.left}"
+            y1="${yy}"
+            x2="${width - margin.right}"
+            y2="${yy}"
+          ></line>
+  
+          <text
+            class="gs-chart-y-label"
+            x="${margin.left - 12}"
+            y="${yy + 4}"
+            text-anchor="end"
+          >
+            ${compactChartMoney(value)}
+          </text>
+        `;
+      })
+      .join("");
+  
+    const labelStep = Math.max(1, Math.ceil(rows.length / 7));
   
     const xLabels = rows
       .map((row, index) => {
@@ -869,62 +921,191 @@
   
         return `
           <text
-            class="chart-x-label"
+            class="gs-chart-x-label"
             x="${x(index)}"
-            y="${height - 16}"
+            y="${height - 14}"
             text-anchor="middle"
           >
-            ปี ${row.policyYear}
+            ${row.age}
           </text>
         `;
       })
       .join("");
   
     container.innerHTML = `
-      <svg
-        class="benefit-svg"
-        viewBox="0 0 ${width} ${height}"
-        role="img"
-        aria-label="กราฟเปรียบเทียบเบี้ยสะสม เวนคืนรวม และเสียชีวิตรวม"
-      >
-        <rect class="chart-bg" x="0" y="0" width="${width}" height="${height}"></rect>
+      <div class="gs-benefit-chart-layout">
+        <div class="gs-benefit-chart-card">
+          <svg
+            class="gs-benefit-chart-svg"
+            viewBox="0 0 ${width} ${height}"
+            role="img"
+            aria-label="กราฟแสดงผลประโยชน์ตามอายุ"
+          >
+            <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>
   
-        ${yTicks}
+            ${yTicks}
   
-        <line
-          class="chart-axis"
-          x1="${margin.left}"
-          y1="${margin.top}"
-          x2="${margin.left}"
-          y2="${height - margin.bottom}"
-        ></line>
+            <line
+              class="gs-chart-axis"
+              x1="${margin.left}"
+              y1="${margin.top}"
+              x2="${margin.left}"
+              y2="${height - margin.bottom}"
+            ></line>
   
-        <line
-          class="chart-axis"
-          x1="${margin.left}"
-          y1="${height - margin.bottom}"
-          x2="${width - margin.right}"
-          y2="${height - margin.bottom}"
-        ></line>
+            <line
+              class="gs-chart-axis"
+              x1="${margin.left}"
+              y1="${height - margin.bottom}"
+              x2="${width - margin.right}"
+              y2="${height - margin.bottom}"
+            ></line>
   
-        <polyline
-          class="chart-line premium"
-          points="${makePoints("cumulativePremiumAfterDiscount")}"
-        ></polyline>
+            <polyline
+              points="${makePoints("deathTotal")}"
+              fill="none"
+              stroke="${deathColor}"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></polyline>
   
-        <polyline
-          class="chart-line surrender"
-          points="${makePoints("surrenderTotal")}"
-        ></polyline>
+            <polyline
+              points="${makePoints("surrenderTotal")}"
+              fill="none"
+              stroke="${surrenderColor}"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></polyline>
   
-        <polyline
-          class="chart-line death"
-          points="${makePoints("deathTotal")}"
-        ></polyline>
+            <polyline
+              points="${makePoints("cumulativePremiumAfterDiscount")}"
+              fill="none"
+              stroke="${premiumColor}"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></polyline>
   
-        ${xLabels}
-      </svg>
+            <line
+              class="gs-chart-selected-line"
+              x1="${selectedX}"
+              y1="${margin.top}"
+              x2="${selectedX}"
+              y2="${height - margin.bottom}"
+            ></line>
+  
+            <circle cx="${selectedX}" cy="${selectedDeathY}" r="6" fill="#ffffff" stroke="${deathColor}" stroke-width="4"></circle>
+            <circle cx="${selectedX}" cy="${selectedSurrenderY}" r="6" fill="#ffffff" stroke="${surrenderColor}" stroke-width="4"></circle>
+            <circle cx="${selectedX}" cy="${selectedPremiumY}" r="6" fill="#ffffff" stroke="${premiumColor}" stroke-width="4"></circle>
+  
+            <rect
+              class="gs-chart-tooltip-bg"
+              x="${Math.min(Math.max(selectedX - 78, margin.left), width - margin.right - 156)}"
+              y="${margin.top - 30}"
+              width="156"
+              height="28"
+              rx="14"
+            ></rect>
+  
+            <text
+              class="gs-chart-tooltip-text"
+              x="${Math.min(Math.max(selectedX, margin.left + 78), width - margin.right - 78)}"
+              y="${margin.top - 11}"
+              text-anchor="middle"
+            >
+              อายุ ${selectedAge} | IRR: ${irrLabel}
+            </text>
+  
+            ${xLabels}
+  
+            <text
+              class="gs-chart-x-title"
+              x="${margin.left + chartWidth / 2}"
+              y="${height - 2}"
+              text-anchor="middle"
+            >
+              อายุผู้เอาประกัน
+            </text>
+          </svg>
+        </div>
+  
+        <aside class="gs-chart-side-panel">
+          <h3>ข้อมูล ณ อายุ: ${selectedAge} ปี</h3>
+          <p class="gs-chart-selected-year">ปีกรมธรรม์ที่ ${selectedYear}</p>
+  
+          <div class="gs-chart-value-list">
+            <div class="gs-chart-value-item death">
+              <span class="gs-chart-color-box"></span>
+              <div>
+                <p>เสียชีวิต</p>
+                <strong>${money(selectedRow.deathTotal)}</strong>
+              </div>
+            </div>
+  
+            <div class="gs-chart-value-item surrender">
+              <span class="gs-chart-color-box"></span>
+              <div>
+                <p>เวนคืน</p>
+                <strong>${money(selectedRow.surrenderTotal)}</strong>
+              </div>
+            </div>
+  
+            <div class="gs-chart-value-item premium">
+              <span class="gs-chart-color-box"></span>
+              <div>
+                <p>เบี้ยสะสม</p>
+                <strong>${money(selectedRow.cumulativePremiumAfterDiscount)}</strong>
+              </div>
+            </div>
+          </div>
+  
+          <div class="gs-chart-irr-box">
+            <span>IRR เวนคืน</span>
+            <strong>${irrLabel}</strong>
+          </div>
+        </aside>
+      </div>
     `;
+  
+    const svg = container.querySelector(".gs-benefit-chart-svg");
+    if (!svg) return;
+  
+    const updateSelectedIndexFromEvent = (event) => {
+      const rect = svg.getBoundingClientRect();
+      const svgX = ((event.clientX - rect.left) / rect.width) * width;
+      const ratio = (svgX - margin.left) / chartWidth;
+      const nextIndex = clampIndex(Math.round(ratio * finalIndex), finalIndex);
+  
+      if (nextIndex === selectedIndex) return;
+  
+      container.dataset.selectedIndex = String(nextIndex);
+      renderBenefitChart(quote);
+    };
+  
+    let isDragging = false;
+  
+    svg.addEventListener("pointerdown", (event) => {
+      isDragging = true;
+      svg.setPointerCapture?.(event.pointerId);
+      updateSelectedIndexFromEvent(event);
+    });
+  
+    svg.addEventListener("pointermove", (event) => {
+      if (!isDragging) return;
+      updateSelectedIndexFromEvent(event);
+    });
+  
+    svg.addEventListener("pointerup", () => {
+      isDragging = false;
+    });
+  
+    svg.addEventListener("pointerleave", () => {
+      isDragging = false;
+    });
+  
+    svg.addEventListener("click", updateSelectedIndexFromEvent);
   }
 
   // =============================
