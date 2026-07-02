@@ -71,7 +71,7 @@
       plan.assumedIndexReturn ??
       "";
 
-    return `ผลตอบแทนดัชนีสมมติที่ใช้คำนวณ: ${formatPercentText(assumedReturn)} ต่อปี`;
+    return `ผลตอบแทนคาดหวังจากดัชนี: ${formatPercentText(assumedReturn)} ต่อปี`;
   }
 
   function makeBenefitTableSheetData(quote) {
