@@ -766,6 +766,60 @@
     return cashflows;
   }
 
+  function calculateSurrenderIrrAtYear(quote, targetIndex) {
+    if (!quote || !quote.ok || !Array.isArray(quote.yearlyTable)) {
+      return null;
+    }
+  
+    const rows = quote.yearlyTable;
+    const s = quote.summary || {};
+    const index = Math.max(0, Math.min(Number(targetIndex) || 0, rows.length - 1));
+  
+    const payoutOption = s.payoutOption === "accumulate" ? "accumulate" : "withdraw";
+    const includeTax = s.taxMode === "include";
+  
+    const cashflows = [];
+  
+    // t=0: จ่ายเบี้ยปีแรก
+    cashflows.push(-(Number(rows[0].premiumAfterDiscount) || 0));
+  
+    for (let i = 0; i <= index; i++) {
+      const row = rows[i];
+  
+      const nextPremium =
+        i + 1 <= index ? Number(rows[i + 1].premiumAfterDiscount) || 0 : 0;
+  
+      let inflow = 0;
+  
+      // ประหยัดภาษีถือเป็น cash benefit รายปี เฉพาะตอนเลือก “ลดหย่อน”
+      if (includeTax) {
+        inflow += Number(row.taxSaving) || 0;
+      }
+  
+      // ถ้าเลือกรับเงินคืนออก รับเงินคืน/ดัชนีในปีก่อนหน้า
+      // แต่ปีที่เวนคืน ไม่เอา livingBenefit ปีนั้นมาซ้ำ
+      if (payoutOption === "withdraw" && i < index) {
+        inflow += Number(row.livingBenefit) || 0;
+        inflow += Number(row.projectedIndexBenefit) || 0;
+      }
+  
+      // ปีที่เลือก = เวนคืน
+      if (i === index) {
+        if (payoutOption === "accumulate") {
+          const taxPart = includeTax ? Number(row.cumulativeTaxSaving) || 0 : 0;
+          inflow += Math.max(0, (Number(row.surrenderTotal) || 0) - taxPart);
+        } else {
+          inflow += Number(row.surrenderGuaranteed) || 0;
+          inflow += Number(row.surrenderIndexBenefit) || 0;
+        }
+      }
+  
+      cashflows.push(roundMoney(inflow - nextPremium));
+    }
+  
+    return calculateIrr(cashflows);
+  }
+
   // -----------------------------
   // Main quote calculation
   // -----------------------------
@@ -1011,6 +1065,7 @@
     buildYearlyTable,
     calculateProjectedIndexBenefit,
     calculateBaseAnnualPremium,
+    calculateSurrenderIrrAtYear,
 
     toSummaryRows,
     toYearlyTableRows,
