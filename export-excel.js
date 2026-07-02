@@ -1,6 +1,7 @@
 // export-excel.js
 // Excel export for Global Saving Calculator
-// ใช้ SheetJS: XLSX global object ต้องถูกโหลดก่อน export-excel.js
+// Version: Benefit Table only
+// ใช้ SheetJS / xlsx-js-style: XLSX global object ต้องถูกโหลดก่อน export-excel.js
 
 (function () {
   "use strict";
@@ -9,13 +10,23 @@
     return value == null || value === "" ? fallback : String(value);
   }
 
-  function safeNumber(value) {
+  function safeNumber(value, fallback = 0) {
     const n = Number(value);
-    return Number.isFinite(n) ? n : 0;
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function pickNumber(source, keys, fallback = "") {
+    for (const key of keys) {
+      if (source && source[key] != null && source[key] !== "") {
+        const n = Number(source[key]);
+        if (Number.isFinite(n)) return n;
+      }
+    }
+    return fallback;
   }
 
   function safeFileName(text) {
-    return String(text || "global-saving-quotation")
+    return String(text || "global-saving-benefit-table")
       .trim()
       .replace(/[\\/:*?"<>|]/g, "-")
       .replace(/\s+/g, "-")
@@ -34,128 +45,111 @@
 
     const sumAssured = safeNumber(s.sumAssured).toLocaleString("th-TH");
 
-    return `${safeFileName(`${plan}-${customer}-${sumAssured}`)}.xlsx`;
+    return `${safeFileName(`${plan}-${customer}-${sumAssured}-benefit-table`)}.xlsx`;
   }
 
-  function makeSummarySheetData(quote) {
-    const s = quote.summary;
-    const meta = quote.meta || {};
+  function formatPercentText(value) {
+    if (value == null || value === "") return "-";
 
-    return [
-      ["Global Saving Quotation"],
-      [],
-      ["วันที่จัดทำ", meta.createdDateText || "-"],
-      ["ชื่อลูกค้า", meta.customerName || "-"],
-      ["ชื่อผู้เสนอ", meta.advisorName || "-"],
-      [],
-      ["ข้อมูลแผน", ""],
-      ["แผน", s.displayName || s.planName || "-"],
-      ["รหัสแผน", s.code || "-"],
-      ["เพศ", s.gender === "female" ? "หญิง" : "ชาย"],
-      ["อายุ", s.age],
-      ["ทุนประกันภัย", s.sumAssured],
-      ["ระยะเวลาคุ้มครอง", `${s.coverageYears} ปี`],
-      ["ระยะเวลาชำระเบี้ย", `${s.premiumPayYears} ปี`],
-      ["งวดชำระเบี้ย", s.paymentMode || "รายปี"],
-      [],
-      ["เบี้ยและส่วนลด", ""],
-      ["เบี้ยก่อนส่วนลด / ปี", s.annualPremiumBeforeDiscount],
-      ["อัตราส่วนลด", s.discountRate],
-      ["ส่วนลด / ปี", s.annualDiscountAmount],
-      ["เบี้ยหลังส่วนลด / ปี", s.annualPremiumAfterDiscount],
-      ["เบี้ยรวมก่อนส่วนลด", s.totalPremiumBeforeDiscount],
-      ["ส่วนลดรวม", s.totalDiscount],
-      ["เบี้ยรวมหลังส่วนลด", s.totalPremiumAfterDiscount],
-      ["เงื่อนไขส่วนลด", s.discountLabel || "-"],
-      [],
-      ["ผลประโยชน์ประมาณการ", ""],
-      ["ผลตอบแทนดัชนีสมมติเฉลี่ยต่อปี", `${s.assumedIndexReturn}%`],
-      ["เงินจ่ายคืนรวม", s.totalCashback],
-      ["ผลตอบแทนดัชนีประมาณการ", s.totalProjectedIndexBenefit],
-      ["ผลประโยชน์ครบกำหนดแบบรับรอง", s.guaranteedMaturityBenefit],
-      ["ผลประโยชน์รวมประมาณการ", s.projectedTotalBenefit],
-      [],
-      ["หมายเหตุ", "เอกสารนี้เป็นเพียงเครื่องมือช่วยคำนวณและสรุปข้อมูลเบื้องต้น ไม่ใช่เอกสารกรมธรรม์จริง"]
-    ];
+    const n = Number(value);
+    if (!Number.isFinite(n)) return safeText(value);
+
+    return `${n.toLocaleString("th-TH", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    })}%`;
   }
 
-  function makeYearlySheetData(quote) {
-    const header = [
-      "ปีกรมธรรม์",
-      "อายุ",
-      "เบี้ยก่อนส่วนลด",
-      "ส่วนลด",
-      "เบี้ยหลังส่วนลด",
-      "เบี้ยสะสมก่อนส่วนลด",
-      "ส่วนลดสะสม",
-      "เบี้ยสะสมหลังส่วนลด",
-      "เงินจ่ายคืนรายปี",
-      "เงินจ่ายคืนสะสม",
-      "อัตราจ่ายผลตอบแทนดัชนี",
-      "ผลตอบแทนดัชนีประมาณการ",
-      "ผลตอบแทนดัชนีสะสม",
-      "ผลประโยชน์ครบกำหนด",
-      "ผลประโยชน์รวมปีนี้"
-    ];
-
-    const rows = quote.yearlyTable.map((row) => [
-      row.policyYear,
-      row.age,
-      row.premiumBeforeDiscount,
-      row.discountAmount,
-      row.premiumAfterDiscount,
-      row.cumulativePremiumBeforeDiscount,
-      row.cumulativeDiscount,
-      row.cumulativePremiumAfterDiscount,
-      row.annualCashback,
-      row.cumulativeCashback,
-      row.indexPayoutRate,
-      row.projectedIndexBenefit,
-      row.cumulativeIndexBenefit,
-      row.guaranteedMaturityBenefit,
-      row.totalBenefitThisYear
-    ]);
-
-    return [header, ...rows];
-  }
-
-  function makeInputSheetData(quote) {
+  function getAssumedReturnText(quote) {
+    const s = quote.summary || {};
     const input = quote.input || {};
     const plan = quote.plan || {};
 
-    return [
-      ["Input Data"],
-      [],
-      ["planId", input.planId || ""],
-      ["planName", plan.displayName || plan.planName || ""],
-      ["gender", input.gender || ""],
-      ["age", input.age || ""],
-      ["sumAssured", input.sumAssured || ""],
-      ["annualPremiumBeforeDiscount", input.annualPremium || ""],
-      ["assumedIndexReturn", input.assumedIndexReturn || ""],
-      ["taxRate", input.taxRate || ""],
-      ["customerName", input.customerName || ""],
-      ["advisorName", input.advisorName || ""]
-    ];
+    const assumedReturn =
+      s.assumedIndexReturn ??
+      input.assumedIndexReturn ??
+      plan.assumedIndexReturn ??
+      "";
+
+    return `ผลตอบแทนดัชนีสมมติที่ใช้คำนวณ: ${formatPercentText(assumedReturn)} ต่อปี`;
   }
 
-  function makeLogSheetData() {
-    if (!window.GSLog || typeof GSLog.readLogs !== "function") {
-      return [
-        ["timestamp", "action", "payload"],
-        ["", "ไม่พบ GSLog", ""]
-      ];
-    }
+  function makeBenefitTableSheetData(quote) {
+    const s = quote.summary || {};
+    const table = Array.isArray(quote.yearlyTable) ? quote.yearlyTable : [];
 
-    const logs = GSLog.readLogs();
+    const title = "ตารางผลประโยชน์รายปี";
+    const subtitle = getAssumedReturnText(quote);
+    const planLine = `${safeText(s.displayName || s.planName, "-")} ${
+      s.code ? `(${s.code})` : ""
+    }`.trim();
+
+    const header = [
+      "ปี",
+      "อายุ",
+      "เบี้ยประกัน",
+      "เงินคืน",
+      "ผลตอบแทน\nดัชนี",
+      "กรณีเวนคืน\nผลประโยชน์รวม",
+      "กรณีเสียชีวิต\nผลประโยชน์รวม"
+    ];
+
+    const rows = table.map((row) => [
+      row.policyYear,
+      row.age,
+
+      pickNumber(
+        row,
+        ["premiumAfterDiscount", "premium", "annualPremiumAfterDiscount"],
+        0
+      ),
+
+      pickNumber(
+        row,
+        ["annualCashback", "cashback", "cashReturn"],
+        0
+      ),
+
+      pickNumber(
+        row,
+        ["projectedIndexBenefit", "indexBenefit", "annualIndexBenefit"],
+        0
+      ),
+
+      pickNumber(
+        row,
+        [
+          "totalBenefitThisYear",
+          "surrenderBenefitTotal",
+          "surrenderValue",
+          "totalSurrenderBenefit",
+          "totalBenefitIfSurrender"
+        ],
+        0
+      ),
+
+      pickNumber(
+        row,
+        [
+          "deathBenefitTotal",
+          "totalDeathBenefit",
+          "totalDeathBenefitThisYear",
+          "deathBenefitThisYear",
+          "deathBenefit",
+          "projectedDeathBenefit",
+          "totalBenefitIfDeath",
+          "totalBenefitOnDeath"
+        ],
+        ""
+      )
+    ]);
 
     return [
-      ["timestamp", "action", "payload"],
-      ...logs.map((log) => [
-        log.timestamp || "",
-        log.action || "",
-        JSON.stringify(log.payload || {})
-      ])
+      [title, "", "", "", "", "", ""],
+      [subtitle, "", "", "", "", "", ""],
+      [planLine, "", "", "", "", "", ""],
+      header,
+      ...rows
     ];
   }
 
@@ -163,35 +157,178 @@
     worksheet["!cols"] = widths.map((wch) => ({ wch }));
   }
 
-  function setMoneyFormat(worksheet, cellRange, columns) {
-    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  function setRowHeights(worksheet, rowHeights) {
+    worksheet["!rows"] = rowHeights.map((hpt) => ({ hpt }));
+  }
 
-    for (let r = cellRange.startRow; r <= range.e.r; r++) {
+  function cellAddress(rowIndex, colIndex) {
+    return XLSX.utils.encode_cell({ r: rowIndex, c: colIndex });
+  }
+
+  function ensureCell(worksheet, address) {
+    if (!worksheet[address]) worksheet[address] = { t: "s", v: "" };
+    return worksheet[address];
+  }
+
+  function applyStyle(worksheet, address, style) {
+    const cell = ensureCell(worksheet, address);
+    cell.s = Object.assign({}, cell.s || {}, style);
+  }
+
+  function applyNumberFormat(worksheet, startRow, endRow, columns, numberFormat) {
+    for (let r = startRow; r <= endRow; r++) {
       columns.forEach((c) => {
-        const address = XLSX.utils.encode_cell({ r, c });
-        if (worksheet[address] && typeof worksheet[address].v === "number") {
-          worksheet[address].z = "#,##0.00";
+        const address = cellAddress(r, c);
+        const cell = worksheet[address];
+
+        if (cell && typeof cell.v === "number") {
+          cell.z = numberFormat;
         }
       });
     }
   }
 
-  function setPercentFormat(worksheet, cellRange, columns) {
-    const range = XLSX.utils.decode_range(worksheet["!ref"]);
+  function applyBenefitTableStyle(worksheet, dataRowCount) {
+    const lastRow = 3 + dataRowCount;
+    const lastCol = 6;
 
-    for (let r = cellRange.startRow; r <= range.e.r; r++) {
-      columns.forEach((c) => {
-        const address = XLSX.utils.encode_cell({ r, c });
-        if (worksheet[address] && typeof worksheet[address].v === "number") {
-          worksheet[address].z = "0.00%";
-        }
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: lastCol } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: lastCol } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: lastCol } }
+    ];
+
+    worksheet["!autofilter"] = {
+      ref: `A4:G${lastRow + 1}`
+    };
+
+    const thinBorder = {
+      top: { style: "thin", color: { rgb: "D8E0EA" } },
+      bottom: { style: "thin", color: { rgb: "D8E0EA" } },
+      left: { style: "thin", color: { rgb: "D8E0EA" } },
+      right: { style: "thin", color: { rgb: "D8E0EA" } }
+    };
+
+    const baseCellStyle = {
+      font: {
+        name: "Arial",
+        sz: 11,
+        color: { rgb: "111827" }
+      },
+      alignment: {
+        vertical: "center",
+        horizontal: "right"
+      },
+      border: thinBorder
+    };
+
+    const headerStyle = {
+      font: {
+        name: "Arial",
+        sz: 11,
+        bold: true,
+        color: { rgb: "111827" }
+      },
+      fill: {
+        fgColor: { rgb: "F3F4F6" }
+      },
+      alignment: {
+        vertical: "center",
+        horizontal: "center",
+        wrapText: true
+      },
+      border: thinBorder
+    };
+
+    for (let r = 3; r <= lastRow; r++) {
+      for (let c = 0; c <= lastCol; c++) {
+        applyStyle(
+          worksheet,
+          cellAddress(r, c),
+          r === 3 ? headerStyle : baseCellStyle
+        );
+      }
+    }
+
+    // จัดกึ่งกลางคอลัมน์ ปี / อายุ
+    for (let r = 4; r <= lastRow; r++) {
+      [0, 1].forEach((c) => {
+        applyStyle(worksheet, cellAddress(r, c), {
+          alignment: {
+            vertical: "center",
+            horizontal: "center"
+          }
+        });
       });
     }
+
+    // เน้นคอลัมน์ผลประโยชน์รวมแบบ PDF
+    for (let r = 4; r <= lastRow; r++) {
+      [5, 6].forEach((c) => {
+        applyStyle(worksheet, cellAddress(r, c), {
+          font: {
+            name: "Arial",
+            sz: 11,
+            bold: true,
+            color: { rgb: "0B4D94" }
+          }
+        });
+      });
+    }
+
+    // Title
+    applyStyle(worksheet, "A1", {
+      font: {
+        name: "Arial",
+        sz: 18,
+        bold: true,
+        color: { rgb: "0F172A" }
+      },
+      alignment: {
+        vertical: "center",
+        horizontal: "left"
+      }
+    });
+
+    // Assumed return line
+    applyStyle(worksheet, "A2", {
+      font: {
+        name: "Arial",
+        sz: 11,
+        bold: true,
+        color: { rgb: "0B4D94" }
+      },
+      alignment: {
+        vertical: "center",
+        horizontal: "left"
+      }
+    });
+
+    // Plan line
+    applyStyle(worksheet, "A3", {
+      font: {
+        name: "Arial",
+        sz: 10,
+        color: { rgb: "64748B" }
+      },
+      alignment: {
+        vertical: "center",
+        horizontal: "left"
+      }
+    });
+
+    applyNumberFormat(worksheet, 4, lastRow, [2, 3, 4, 5, 6], "#,##0.00");
   }
 
-  function createWorksheet(data, widths) {
+  function createBenefitTableWorksheet(quote) {
+    const data = makeBenefitTableSheetData(quote);
     const ws = XLSX.utils.aoa_to_sheet(data);
-    setColumnWidths(ws, widths);
+
+    setColumnWidths(ws, [8, 8, 16, 16, 20, 22, 22]);
+    setRowHeights(ws, [28, 22, 20, 42]);
+
+    applyBenefitTableStyle(ws, data.length - 4);
+
     return ws;
   }
 
@@ -207,26 +344,9 @@
     }
 
     const wb = XLSX.utils.book_new();
+    const benefitWs = createBenefitTableWorksheet(quote);
 
-    const summaryWs = createWorksheet(makeSummarySheetData(quote), [34, 34]);
-    const yearlyWs = createWorksheet(
-      makeYearlySheetData(quote),
-      [12, 10, 18, 16, 18, 20, 16, 20, 18, 18, 22, 22, 22, 20, 20]
-    );
-    const inputWs = createWorksheet(makeInputSheetData(quote), [30, 38]);
-    const logWs = createWorksheet(makeLogSheetData(), [28, 22, 80]);
-
-    setMoneyFormat(summaryWs, { startRow: 0 }, [1]);
-    setPercentFormat(summaryWs, { startRow: 0 }, [1]);
-
-    setMoneyFormat(yearlyWs, { startRow: 1 }, [2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14]);
-    setPercentFormat(yearlyWs, { startRow: 1 }, [10]);
-
-    XLSX.utils.book_append_sheet(wb, summaryWs, "Summary");
-    XLSX.utils.book_append_sheet(wb, yearlyWs, "Yearly Table");
-    XLSX.utils.book_append_sheet(wb, inputWs, "Input");
-    XLSX.utils.book_append_sheet(wb, logWs, "Local Log");
-
+    XLSX.utils.book_append_sheet(wb, benefitWs, "Benefit Table");
     XLSX.writeFile(wb, buildFileName(quote));
   }
 
