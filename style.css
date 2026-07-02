@@ -2416,11 +2416,12 @@ tbody tr:last-child td {
   
   .gs-chart-side-panel {
     order: -1 !important;
+  
     display: grid !important;
-    grid-template-columns: 140px repeat(4, minmax(0, 1fr)) !important;
+    grid-template-columns: 170px repeat(4, minmax(0, 1fr)) !important;
     grid-template-rows: auto auto !important;
-    gap: 6px 16px !important;
-    align-items: end !important;
+    gap: 6px 18px !important;
+    align-items: start !important;
   
     padding: 0 0 12px !important;
     border-radius: 0 !important;
@@ -2430,39 +2431,36 @@ tbody tr:last-child td {
     border-bottom: 1px solid #e5e7eb !important;
   }
   
-  .gs-chart-side-panel h3,
-  .gs-chart-selected-year,
-  .gs-chart-value-list,
-  .gs-chart-irr-list {
-    all: unset;
-  }
-  
+  /* column 1: อายุ / ปีกรมธรรม์ */
   .gs-chart-side-panel h3 {
     grid-column: 1 !important;
     grid-row: 1 !important;
+  
+    margin: 0 !important;
     color: #0f172a !important;
     font-size: 10.5pt !important;
     font-weight: 850 !important;
-    line-height: 1.2 !important;
+    line-height: 1.15 !important;
+    text-align: left !important;
+    align-self: end !important;
   }
   
   .gs-chart-selected-year {
     grid-column: 1 !important;
     grid-row: 2 !important;
+  
+    margin: 0 !important;
     color: #64748b !important;
     font-size: 8.4pt !important;
     font-weight: 500 !important;
-    line-height: 1.2 !important;
+    line-height: 1.15 !important;
+    text-align: left !important;
+    align-self: start !important;
   }
   
+  /* ทำให้ value-list แตกออกมาอยู่ใน grid หลัก */
   .gs-chart-value-list {
-    grid-column: 2 / 5 !important;
-    grid-row: 1 / 3 !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    grid-template-rows: auto auto !important;
-    gap: 6px 16px !important;
-    align-items: end !important;
+    display: contents !important;
   }
   
   .gs-chart-value-item {
@@ -2473,46 +2471,69 @@ tbody tr:last-child td {
     display: none !important;
   }
   
-  .gs-chart-value-item p {
+  /* labels */
+  .gs-chart-value-item p,
+  .gs-chart-irr-list span {
     margin: 0 !important;
-    color: #111827 !important;
     font-size: 8.4pt !important;
     font-weight: 700 !important;
     line-height: 1.15 !important;
+    align-self: end !important;
   }
   
-  .gs-chart-value-item strong {
-    display: block !important;
+  /* values */
+  .gs-chart-value-item strong,
+  .gs-chart-irr-list strong {
     margin: 0 !important;
     font-size: 10.8pt !important;
     font-weight: 850 !important;
     line-height: 1.15 !important;
     white-space: nowrap !important;
+    align-self: start !important;
   }
   
-  .gs-chart-value-item.death p,
-  .gs-chart-value-item.death strong {
+  /* column 2: เสียชีวิต */
+  .gs-chart-value-item.death p {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
     color: #2f80ed !important;
   }
   
-  .gs-chart-value-item.surrender p,
-  .gs-chart-value-item.surrender strong {
+  .gs-chart-value-item.death strong {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    color: #2f80ed !important;
+  }
+  
+  /* column 3: เวนคืน */
+  .gs-chart-value-item.surrender p {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
     color: #f59e0b !important;
   }
   
-  .gs-chart-value-item.premium p,
-  .gs-chart-value-item.premium strong {
+  .gs-chart-value-item.surrender strong {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+    color: #f59e0b !important;
+  }
+  
+  /* column 4: เบี้ยสะสม */
+  .gs-chart-value-item.premium p {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
     color: #178a2f !important;
   }
   
+  .gs-chart-value-item.premium strong {
+    grid-column: 4 !important;
+    grid-row: 2 !important;
+    color: #178a2f !important;
+  }
+  
+  /* column 5: IRR */
   .gs-chart-irr-list {
-    grid-column: 5 !important;
-    grid-row: 1 / 3 !important;
-    display: grid !important;
-    grid-template-rows: auto auto !important;
-    gap: 6px !important;
-    align-items: end !important;
-    justify-items: start !important;
+    display: contents !important;
   }
   
   .gs-chart-irr-list div:first-child {
@@ -2524,20 +2545,15 @@ tbody tr:last-child td {
   }
   
   .gs-chart-irr-list span {
-    margin: 0 !important;
+    grid-column: 5 !important;
+    grid-row: 1 !important;
     color: #111827 !important;
-    font-size: 8.4pt !important;
-    font-weight: 700 !important;
-    line-height: 1.15 !important;
   }
   
   .gs-chart-irr-list strong {
-    margin: 0 !important;
+    grid-column: 5 !important;
+    grid-row: 2 !important;
     color: #0f172a !important;
-    font-size: 10.8pt !important;
-    font-weight: 850 !important;
-    line-height: 1.15 !important;
-    white-space: nowrap !important;
   }
   
   .gs-benefit-chart-card {
