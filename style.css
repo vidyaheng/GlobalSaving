@@ -2133,7 +2133,368 @@ tbody tr:last-child td {
     color: #6b7280 !important;
   }
 
-  .disclaimer {
+    /* =========================
+       PDF Layout Refinement
+    ========================= */
+
+  .report-cover.report-hero {
+    padding: 0 0 10px !important;
+    border: 0 !important;
     background: #ffffff !important;
+  }
+
+  .report-hero-top {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 245px !important;
+    gap: 18px !important;
+    align-items: start !important;
+  }
+
+  .report-title-block .eyebrow {
+    display: none !important;
+  }
+
+  .report-title-block h2 {
+    margin: 0 0 4px !important;
+    color: #1f2aa8 !important;
+    font-size: 18pt !important;
+    font-weight: 850 !important;
+    line-height: 1.18 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .report-plan-line {
+    margin: 0 !important;
+    color: #e11d48 !important;
+    font-size: 13pt !important;
+    font-weight: 800 !important;
+    line-height: 1.28 !important;
+  }
+
+  .report-code-pill {
+    padding: 1px 7px !important;
+    font-size: 8.5pt !important;
+    vertical-align: middle !important;
+  }
+
+  .report-client-block {
+    width: 100% !important;
+    justify-self: end !important;
+    display: grid !important;
+    gap: 2px !important;
+    padding-top: 2px !important;
+  }
+
+  .client-row {
+    display: grid !important;
+    grid-template-columns: 70px minmax(0, 1fr) !important;
+    gap: 8px !important;
+    padding: 1px 0 !important;
+    align-items: baseline !important;
+  }
+
+  .client-row span {
+    color: #64748b !important;
+    font-size: 7.8pt !important;
+    font-weight: 500 !important;
+  }
+
+  .client-row strong {
+    color: #0f3f7a !important;
+    font-size: 8.2pt !important;
+    font-weight: 650 !important;
+    line-height: 1.25 !important;
+  }
+
+  .customer-row strong {
+    color: #0f172a !important;
+    font-size: 8.8pt !important;
+    font-weight: 800 !important;
+  }
+
+  .hero-accent-line {
+    height: 1px !important;
+    margin: 12px 0 12px !important;
+    background: linear-gradient(
+      90deg,
+      rgba(15, 94, 168, 0.45),
+      rgba(225, 29, 72, 0.25),
+      transparent
+    ) !important;
+  }
+
+  .plan-metric-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px 22px !important;
+  }
+
+  .plan-metric span {
+    margin-bottom: 3px !important;
+    color: #64748b !important;
+    font-size: 8pt !important;
+    font-weight: 500 !important;
+    line-height: 1.25 !important;
+  }
+
+  .plan-metric strong,
+  .plan-metric.major strong {
+    color: #0f172a !important;
+    font-size: 13pt !important;
+    font-weight: 750 !important;
+    line-height: 1.22 !important;
+  }
+
+  /* Benefit summary: no card box, more like top plan info */
+  .benefit-summary-section {
+    padding: 12px 0 0 !important;
+    border: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  .benefit-clean-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 245px !important;
+    gap: 18px !important;
+    align-items: end !important;
+    margin-bottom: 12px !important;
+  }
+
+  .benefit-clean-header .eyebrow {
+    margin-bottom: 3px !important;
+    font-size: 8pt !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .benefit-clean-header h3 {
+    margin: 0 !important;
+    font-size: 15pt !important;
+    font-weight: 850 !important;
+    line-height: 1.2 !important;
+  }
+
+  .benefit-main-value {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-align: right !important;
+    overflow: visible !important;
+  }
+
+  .benefit-main-value span {
+    margin-bottom: 3px !important;
+    color: #64748b !important;
+    font-size: 8pt !important;
+    font-weight: 500 !important;
+  }
+
+  .benefit-main-value strong {
+    color: #0b4d94 !important;
+    font-size: 15pt !important;
+    font-weight: 850 !important;
+    line-height: 1.15 !important;
+  }
+
+  .benefit-mini-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #e5e7eb !important;
+  }
+
+  .benefit-mini-grid > div {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .benefit-mini-grid span {
+    margin-bottom: 3px !important;
+    color: #64748b !important;
+    font-size: 8pt !important;
+    font-weight: 500 !important;
+  }
+
+  .benefit-mini-grid strong {
+    color: #0f3f7a !important;
+    font-size: 12pt !important;
+    font-weight: 800 !important;
+  }
+
+  .disclaimer {
+    display: none !important;
+  }
+
+  /* Chart PDF layout: info box horizontal before chart */
+  #tab-chart {
+    display: block !important;
+    padding-top: 10px !important;
+  }
+
+  .chart-card {
+    padding: 0 !important;
+    border: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  .chart-card-header {
+    margin-bottom: 8px !important;
+  }
+
+  .chart-card-header h3 {
+    font-size: 15pt !important;
+    margin: 0 0 2px !important;
+  }
+
+  .chart-card-header .muted,
+  #chart-note {
+    font-size: 8pt !important;
+  }
+
+  .chart-box {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+  }
+
+  .gs-benefit-chart-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .gs-chart-side-panel {
+    order: -1 !important;
+    display: grid !important;
+    grid-template-columns: 1.1fr 2.4fr 1.45fr !important;
+    gap: 10px !important;
+    align-items: end !important;
+
+    padding: 0 0 8px !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+  }
+
+  .gs-chart-side-panel h3 {
+    grid-column: 1 !important;
+    margin: 0 !important;
+    color: #0f172a !important;
+    font-size: 10pt !important;
+    font-weight: 850 !important;
+    text-align: left !important;
+  }
+
+  .gs-chart-selected-year {
+    grid-column: 1 !important;
+    margin: 2px 0 0 !important;
+    color: #64748b !important;
+    font-size: 8pt !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+  }
+
+  .gs-chart-value-list {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .gs-chart-value-item {
+    display: grid !important;
+    grid-template-columns: 10px minmax(0, 1fr) !important;
+    gap: 6px !important;
+    align-items: start !important;
+  }
+
+  .gs-chart-color-dot {
+    width: 7px !important;
+    height: 7px !important;
+    margin: 18px 0 0 !important;
+    box-shadow: none !important;
+  }
+
+  .gs-chart-value-item p {
+    margin: 0 0 2px !important;
+    color: #64748b !important;
+    font-size: 7.5pt !important;
+    font-weight: 600 !important;
+  }
+
+  .gs-chart-value-item strong {
+    color: currentColor !important;
+    font-size: 9pt !important;
+    font-weight: 850 !important;
+    line-height: 1.15 !important;
+  }
+
+  .gs-chart-value-item.death {
+    color: #2f80ed !important;
+  }
+
+  .gs-chart-value-item.surrender {
+    color: #f59e0b !important;
+  }
+
+  .gs-chart-value-item.premium {
+    color: #178a2f !important;
+  }
+
+  .gs-chart-irr-list {
+    grid-column: 3 !important;
+    grid-row: 1 / span 2 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    display: grid !important;
+    gap: 4px !important;
+  }
+
+  .gs-chart-irr-list div {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    align-items: baseline !important;
+  }
+
+  .gs-chart-irr-list span {
+    color: #64748b !important;
+    font-size: 7.5pt !important;
+    font-weight: 600 !important;
+  }
+
+  .gs-chart-irr-list strong {
+    color: #0f172a !important;
+    font-size: 8.8pt !important;
+    font-weight: 850 !important;
+  }
+
+  .gs-benefit-chart-card {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  .gs-chart-hint {
+    display: none !important;
+  }
+
+  .gs-benefit-chart-svg {
+    max-height: 130mm !important;
   }
 }
