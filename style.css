@@ -1817,6 +1817,173 @@ tbody tr:last-child td {
 }
 
 /* =========================
+   Interactive Benefit Chart
+========================= */
+
+.gs-benefit-chart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 22px;
+  align-items: stretch;
+}
+
+.gs-benefit-chart-card {
+  min-width: 0;
+  padding: 18px 18px 12px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+}
+
+.gs-benefit-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.gs-chart-grid-line {
+  stroke: rgba(148, 163, 184, 0.48);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+.gs-chart-axis {
+  stroke: #64748b;
+  stroke-width: 1.2;
+}
+
+.gs-chart-y-label,
+.gs-chart-x-label,
+.gs-chart-x-title {
+  fill: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gs-chart-x-title {
+  fill: #64748b;
+  font-size: 12px;
+}
+
+.gs-chart-selected-line {
+  stroke: #64748b;
+  stroke-width: 1.4;
+  stroke-dasharray: 4 4;
+}
+
+.gs-chart-tooltip-bg {
+  fill: #233f97;
+}
+
+.gs-chart-tooltip-text {
+  fill: #ffffff;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.gs-chart-side-panel {
+  padding: 24px 22px;
+  border-radius: 18px;
+  background: #243f91;
+  color: #ffffff;
+  box-shadow: 0 16px 32px rgba(36, 63, 145, 0.22);
+}
+
+.gs-chart-side-panel h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.gs-chart-selected-year {
+  margin: 6px 0 22px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.gs-chart-value-list {
+  display: grid;
+  gap: 20px;
+}
+
+.gs-chart-value-item {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.gs-chart-color-box {
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 4px solid currentColor;
+}
+
+.gs-chart-value-item p {
+  margin: 0 0 5px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.gs-chart-value-item strong {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.gs-chart-value-item.death {
+  color: #7db7ff;
+}
+
+.gs-chart-value-item.surrender {
+  color: #f59e0b;
+}
+
+.gs-chart-value-item.premium {
+  color: #8bc34a;
+}
+
+.gs-chart-irr-box {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.gs-chart-irr-box span {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.gs-chart-irr-box strong {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .gs-benefit-chart-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
    Print / PDF
 ========================= */
 
