@@ -806,6 +806,39 @@
   function clampIndex(value, max) {
     return Math.max(0, Math.min(Number(value) || 0, max));
   }
+
+  function buildSmoothPath(rows, key, x, y) {
+    const points = rows.map((row, index) => ({
+      x: x(index),
+      y: y(row[key])
+    }));
+  
+    if (!points.length) return "";
+    if (points.length === 1) {
+      return `M ${points[0].x} ${points[0].y}`;
+    }
+  
+    const smoothing = 0.18; // ลดเป็น 0.12 ได้ถ้าโค้งมากเกิน
+  
+    let d = `M ${points[0].x} ${points[0].y}`;
+  
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i - 1] || points[i];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2] || p2;
+  
+      const cp1x = p1.x + (p2.x - p0.x) * smoothing;
+      const cp1y = p1.y + (p2.y - p0.y) * smoothing;
+  
+      const cp2x = p2.x - (p3.x - p1.x) * smoothing;
+      const cp2y = p2.y - (p3.y - p1.y) * smoothing;
+  
+      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+    }
+  
+    return d;
+  }
   
   function renderBenefitChart(quote) {
     const container = $("benefit-chart");
@@ -964,32 +997,32 @@
             <line class="gs-chart-axis" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}"></line>
             <line class="gs-chart-axis" x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}"></line>
   
-            <polyline
-              points="${makePoints("deathTotal")}"
+            <path
+              d="${buildSmoothPath(rows, "deathTotal", x, y)}"
               fill="none"
               stroke="${deathColor}"
               stroke-width="3"
               stroke-linecap="round"
               stroke-linejoin="round"
-            ></polyline>
-  
-            <polyline
-              points="${makePoints("surrenderTotal")}"
+            ></path>
+            
+            <path
+              d="${buildSmoothPath(rows, "surrenderTotal", x, y)}"
               fill="none"
               stroke="${surrenderColor}"
               stroke-width="3"
               stroke-linecap="round"
               stroke-linejoin="round"
-            ></polyline>
-  
-            <polyline
-              points="${makePoints("cumulativePremiumAfterDiscount")}"
+            ></path>
+            
+            <path
+              d="${buildSmoothPath(rows, "cumulativePremiumAfterDiscount", x, y)}"
               fill="none"
               stroke="${premiumColor}"
               stroke-width="3"
               stroke-linecap="round"
               stroke-linejoin="round"
-            ></polyline>
+            ></path>
   
             <line
               class="gs-chart-selected-line"
