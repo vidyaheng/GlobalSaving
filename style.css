@@ -1037,21 +1037,6 @@ tbody tr:last-child td {
   stroke: #16a34a;
 }
 
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 18px;
-  margin-top: 14px;
-  color: #475569;
-  font-weight: 700;
-}
-
-.chart-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .legend-dot {
   width: 11px;
   height: 11px;
