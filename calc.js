@@ -820,6 +820,55 @@
     return calculateIrr(cashflows);
   }
 
+  function calculateDeathIrrAtYear(quote, targetIndex) {
+    if (!quote || !quote.ok || !Array.isArray(quote.yearlyTable)) {
+      return null;
+    }
+  
+    const rows = quote.yearlyTable;
+    const s = quote.summary || {};
+    const index = Math.max(0, Math.min(Number(targetIndex) || 0, rows.length - 1));
+  
+    const payoutOption = s.payoutOption === "accumulate" ? "accumulate" : "withdraw";
+    const includeTax = s.taxMode === "include";
+  
+    const cashflows = [];
+  
+    cashflows.push(-(Number(rows[0].premiumAfterDiscount) || 0));
+  
+    for (let i = 0; i <= index; i++) {
+      const row = rows[i];
+  
+      const nextPremium =
+        i + 1 <= index ? Number(rows[i + 1].premiumAfterDiscount) || 0 : 0;
+  
+      let inflow = 0;
+  
+      if (includeTax) {
+        inflow += Number(row.taxSaving) || 0;
+      }
+  
+      if (payoutOption === "withdraw" && i < index) {
+        inflow += Number(row.livingBenefit) || 0;
+        inflow += Number(row.projectedIndexBenefit) || 0;
+      }
+  
+      if (i === index) {
+        if (payoutOption === "accumulate") {
+          const taxPart = includeTax ? Number(row.cumulativeTaxSaving) || 0 : 0;
+          inflow += Math.max(0, (Number(row.deathTotal) || 0) - taxPart);
+        } else {
+          inflow += Number(row.deathGuaranteed) || 0;
+          inflow += Number(row.deathIndexBenefit) || 0;
+        }
+      }
+  
+      cashflows.push(roundMoney(inflow - nextPremium));
+    }
+  
+    return calculateIrr(cashflows);
+  }
+
   // -----------------------------
   // Main quote calculation
   // -----------------------------
@@ -1066,6 +1115,7 @@
     calculateProjectedIndexBenefit,
     calculateBaseAnnualPremium,
     calculateSurrenderIrrAtYear,
+    calculateDeathIrrAtYear,
 
     toSummaryRows,
     toYearlyTableRows,
