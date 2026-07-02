@@ -1196,6 +1196,7 @@
       svg.addEventListener("mousedown", startDrag);
       svg.addEventListener("touchstart", startDrag, { passive: false });
       svg.addEventListener("click", updateSelectedIndexFromEvent);
+  }
 
   // =============================
   // Render quote
