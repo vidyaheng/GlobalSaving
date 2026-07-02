@@ -1483,26 +1483,6 @@
     window.print();
   }
 
-  function handleExportExcel() {
-    if (!currentQuote) {
-      alert("กรุณากดคำนวณก่อน Export Excel");
-      return;
-    }
-
-    writeLog("export_excel", {
-      planId: currentQuote.summary.planId,
-      sumAssured: currentQuote.summary.sumAssured,
-      at: new Date().toISOString()
-    });
-
-    if (window.GSExportExcel && typeof GSExportExcel.exportQuote === "function") {
-      GSExportExcel.exportQuote(currentQuote);
-      return;
-    }
-
-    alert("ยังไม่ได้สร้าง export-excel.js");
-  }
-
   // =============================
   // Keyboard / UX helpers
   // =============================
@@ -1536,7 +1516,6 @@
     $("btn-clear")?.addEventListener("click", clearForm);
   
     $("btn-export-pdf")?.addEventListener("click", handleExportPdf);
-    $("btn-export-excel")?.addEventListener("click", handleExportExcel);
   
     $("sum-assured")?.addEventListener("input", updateAutoPremium);
     $("sum-assured")?.addEventListener("blur", enforceMinimumSumAssured);
