@@ -820,16 +820,15 @@
     );
   
     const selectedRow = rows[selectedIndex];
-    const summary = quote.summary || {};
   
     const width = 920;
     const height = 420;
   
     const margin = {
-      top: 40,
+      top: 42,
       right: 34,
-      bottom: 46,
-      left: 74
+      bottom: 48,
+      left: 76
     };
   
     const chartWidth = width - margin.left - margin.right;
@@ -837,7 +836,7 @@
   
     const deathColor = "#2f80ed";
     const surrenderColor = "#f59e0b";
-    const premiumColor = "#0a8a0a";
+    const premiumColor = "#178a2f";
   
     const maxValue = Math.max(
       ...rows.flatMap((row) => [
@@ -869,21 +868,28 @@
         .join(" ");
     };
   
-    const selectedX = x(selectedIndex);
-    const selectedDeathY = y(selectedRow.deathTotal);
-    const selectedSurrenderY = y(selectedRow.surrenderTotal);
-    const selectedPremiumY = y(selectedRow.cumulativePremiumAfterDiscount);
-  
-    const selectedAge = selectedRow.age;
-    const selectedYear = selectedRow.policyYear;
-  
     const surrenderIrr =
       window.GSCalc &&
       typeof GSCalc.calculateSurrenderIrrAtYear === "function"
         ? GSCalc.calculateSurrenderIrrAtYear(quote, selectedIndex)
         : null;
   
-    const irrLabel = chartIrrText(surrenderIrr);
+    const deathIrr =
+      window.GSCalc &&
+      typeof GSCalc.calculateDeathIrrAtYear === "function"
+        ? GSCalc.calculateDeathIrrAtYear(quote, selectedIndex)
+        : null;
+  
+    const surrenderIrrLabel = chartIrrText(surrenderIrr);
+    const deathIrrLabel = chartIrrText(deathIrr);
+  
+    const selectedX = x(selectedIndex);
+    const selectedAge = selectedRow.age;
+    const selectedYear = selectedRow.policyYear;
+  
+    const selectedDeathY = y(selectedRow.deathTotal);
+    const selectedSurrenderY = y(selectedRow.surrenderTotal);
+    const selectedPremiumY = y(selectedRow.cumulativePremiumAfterDiscount);
   
     const yTicks = [0, 0.25, 0.5, 0.75, 1]
       .map((ratio) => {
@@ -923,7 +929,7 @@
           <text
             class="gs-chart-x-label"
             x="${x(index)}"
-            y="${height - 14}"
+            y="${height - 16}"
             text-anchor="middle"
           >
             ${row.age}
@@ -931,6 +937,16 @@
         `;
       })
       .join("");
+  
+    const tooltipX = Math.min(
+      Math.max(selectedX - 92, margin.left),
+      width - margin.right - 184
+    );
+  
+    const tooltipTextX = Math.min(
+      Math.max(selectedX, margin.left + 92),
+      width - margin.right - 92
+    );
   
     container.innerHTML = `
       <div class="gs-benefit-chart-layout">
@@ -945,21 +961,8 @@
   
             ${yTicks}
   
-            <line
-              class="gs-chart-axis"
-              x1="${margin.left}"
-              y1="${margin.top}"
-              x2="${margin.left}"
-              y2="${height - margin.bottom}"
-            ></line>
-  
-            <line
-              class="gs-chart-axis"
-              x1="${margin.left}"
-              y1="${height - margin.bottom}"
-              x2="${width - margin.right}"
-              y2="${height - margin.bottom}"
-            ></line>
+            <line class="gs-chart-axis" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}"></line>
+            <line class="gs-chart-axis" x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}"></line>
   
             <polyline
               points="${makePoints("deathTotal")}"
@@ -1002,20 +1005,20 @@
   
             <rect
               class="gs-chart-tooltip-bg"
-              x="${Math.min(Math.max(selectedX - 78, margin.left), width - margin.right - 156)}"
-              y="${margin.top - 30}"
-              width="156"
+              x="${tooltipX}"
+              y="${margin.top - 32}"
+              width="184"
               height="28"
               rx="14"
             ></rect>
   
             <text
               class="gs-chart-tooltip-text"
-              x="${Math.min(Math.max(selectedX, margin.left + 78), width - margin.right - 78)}"
-              y="${margin.top - 11}"
+              x="${tooltipTextX}"
+              y="${margin.top - 13}"
               text-anchor="middle"
             >
-              อายุ ${selectedAge} | IRR: ${irrLabel}
+              อายุ ${selectedAge} | IRR: ${surrenderIrrLabel}
             </text>
   
             ${xLabels}
@@ -1029,6 +1032,8 @@
               อายุผู้เอาประกัน
             </text>
           </svg>
+  
+          <p class="gs-chart-hint">แตะหรือลากบนกราฟเพื่อดูข้อมูลแต่ละปี</p>
         </div>
   
         <aside class="gs-chart-side-panel">
@@ -1037,7 +1042,7 @@
   
           <div class="gs-chart-value-list">
             <div class="gs-chart-value-item death">
-              <span class="gs-chart-color-box"></span>
+              <span class="gs-chart-color-dot"></span>
               <div>
                 <p>เสียชีวิต</p>
                 <strong>${money(selectedRow.deathTotal)}</strong>
@@ -1045,7 +1050,7 @@
             </div>
   
             <div class="gs-chart-value-item surrender">
-              <span class="gs-chart-color-box"></span>
+              <span class="gs-chart-color-dot"></span>
               <div>
                 <p>เวนคืน</p>
                 <strong>${money(selectedRow.surrenderTotal)}</strong>
@@ -1053,7 +1058,7 @@
             </div>
   
             <div class="gs-chart-value-item premium">
-              <span class="gs-chart-color-box"></span>
+              <span class="gs-chart-color-dot"></span>
               <div>
                 <p>เบี้ยสะสม</p>
                 <strong>${money(selectedRow.cumulativePremiumAfterDiscount)}</strong>
@@ -1061,9 +1066,16 @@
             </div>
           </div>
   
-          <div class="gs-chart-irr-box">
-            <span>IRR เวนคืน</span>
-            <strong>${irrLabel}</strong>
+          <div class="gs-chart-irr-list">
+            <div>
+              <span>IRR เวนคืน</span>
+              <strong>${surrenderIrrLabel}</strong>
+            </div>
+  
+            <div>
+              <span>IRR เสียชีวิต</span>
+              <strong>${deathIrrLabel}</strong>
+            </div>
           </div>
         </aside>
       </div>
@@ -1098,6 +1110,10 @@
     });
   
     svg.addEventListener("pointerup", () => {
+      isDragging = false;
+    });
+  
+    svg.addEventListener("pointercancel", () => {
       isDragging = false;
     });
   
