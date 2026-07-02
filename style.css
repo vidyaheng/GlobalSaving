@@ -1842,6 +1842,7 @@ tbody tr:last-child td {
   display: block;
   cursor: crosshair;
   user-select: none;
+  touch-action: none;
 }
 
 .gs-chart-grid-line {
@@ -1917,18 +1918,17 @@ tbody tr:last-child td {
   display: grid;
   grid-template-columns: 18px 1fr;
   gap: 12px;
-  align-items: center;
+  align-items: start;
 }
 
 .gs-chart-color-dot {
   width: 12px;
   height: 12px;
-  margin: 0;
+  margin: 28px 0 0 0;
   border-radius: 999px;
   background: currentColor;
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
   flex: 0 0 12px;
-  align-self: center;
 }
 
 .gs-chart-value-item > div {
@@ -1941,7 +1941,7 @@ tbody tr:last-child td {
   color: #ffffff;
   font-size: 0.88rem;
   font-weight: 850;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .gs-chart-value-item strong {
@@ -1949,7 +1949,7 @@ tbody tr:last-child td {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 900;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .gs-chart-value-item.death {
@@ -1964,25 +1964,30 @@ tbody tr:last-child td {
   color: #8bc34a;
 }
 
-.gs-chart-irr-box {
-  margin-top: 24px;
-  padding-top: 16px;
+.gs-chart-irr-list {
+  margin-top: 22px;
+  padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.22);
+  display: grid;
+  gap: 8px;
+}
+
+.gs-chart-irr-list div {
   display: flex;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   align-items: baseline;
 }
 
-.gs-chart-irr-box span {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.82rem;
+.gs-chart-irr-list span {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
-.gs-chart-irr-box strong {
+.gs-chart-irr-list strong {
   color: #ffffff;
-  font-size: 1.2rem;
+  font-size: 0.98rem;
   font-weight: 900;
 }
 
