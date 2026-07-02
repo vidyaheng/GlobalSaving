@@ -2279,7 +2279,7 @@ tbody tr:last-child td {
   .benefit-summary-section {
     display: grid !important;
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 8px 18px !important;
+    gap: 10px 18px !important;
     padding: 12px 0 0 !important;
     border: 0 !important;
     background: #ffffff !important;
@@ -2307,30 +2307,44 @@ tbody tr:last-child td {
     line-height: 1.18 !important;
   }
   
-  .benefit-main-value {
-    grid-column: 1 !important;
+  /* ทั้ง 4 ช่องให้ใช้ความสูงและ baseline เดียวกัน */
+  .benefit-main-value,
+  .benefit-mini-grid > div {
+    min-height: 58px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: flex-start !important;
     padding: 8px 0 0 !important;
     border: 0 !important;
     border-top: 1px solid #e5e7eb !important;
     border-radius: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
-    text-align: left !important;
     overflow: visible !important;
   }
   
-  .benefit-main-value span {
-    margin-bottom: 3px !important;
+  .benefit-main-value {
+    grid-column: 1 !important;
+    text-align: left !important;
+  }
+  
+  .benefit-main-value span,
+  .benefit-mini-grid span {
+    display: block !important;
+    margin: 0 0 5px 0 !important;
     color: #64748b !important;
     font-size: 8pt !important;
     font-weight: 500 !important;
+    line-height: 1.1 !important;
   }
   
   .benefit-main-value strong {
     color: #0b4d94 !important;
-    font-size: 10.8pt !important;
-    font-weight: 760 !important;
-    line-height: 1.12 !important;
+    font-size: 12.2pt !important;
+    font-weight: 820 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
   }
   
   .benefit-mini-grid {
@@ -2339,29 +2353,21 @@ tbody tr:last-child td {
   
   .benefit-mini-grid > div {
     min-width: 0 !important;
-    padding: 8px 0 0 !important;
-    border: 0 !important;
-    border-top: 1px solid #e5e7eb !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-  
-  .benefit-mini-grid span {
-    margin-bottom: 3px !important;
-    color: #64748b !important;
-    font-size: 8pt !important;
-    font-weight: 500 !important;
   }
   
   .benefit-mini-grid strong {
     color: #0f3f7a !important;
-    font-size: 11.5pt !important;
+    font-size: 11.2pt !important;
     font-weight: 780 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
   }
-
-  .disclaimer {
-    display: none !important;
+  
+  /* ช่อง IRR = ช่องที่ 3 ใน benefit-mini-grid
+     (เพราะ 3 ช่องล่างคือ เงินจ่ายคืนรวม / ผลตอบแทนดัชนี / IRR) */
+  .benefit-mini-grid > div:nth-child(3) strong {
+    color: #178a2f !important;
+    font-weight: 820 !important;
   }
 
   /* =========================
@@ -2509,8 +2515,12 @@ tbody tr:last-child td {
     justify-items: start !important;
   }
   
-  .gs-chart-irr-list div {
+  .gs-chart-irr-list div:first-child {
     display: contents !important;
+  }
+  
+  .gs-chart-irr-list div:nth-child(2) {
+    display: none !important;
   }
   
   .gs-chart-irr-list span {
