@@ -660,6 +660,11 @@
     }
   
     setText(
+      "summary-total-benefit-label",
+      taxIncluded ? "ผลรวมหลังภาษี" : "ผลประโยชน์รวม"
+    );
+  
+    setText(
       "report-total-benefit-label",
       taxIncluded ? "ผลรวมหลังภาษี" : "ผลประโยชน์รวม"
     );
