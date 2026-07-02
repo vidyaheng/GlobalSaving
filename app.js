@@ -103,6 +103,45 @@
     return `${(n * 100).toFixed(2)}% ต่อปี`;
   }
 
+  function assumedReturnText(value) {
+    const n = Number(value);
+  
+    if (!Number.isFinite(n)) {
+      return "-";
+    }
+  
+    return n.toLocaleString("th-TH", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
+  }
+  
+  function getAssumptionText(quote) {
+    const s = quote.summary || {};
+    const input = quote.input || {};
+    const plan = quote.plan || {};
+  
+    const assumedReturn =
+      s.assumedIndexReturn ??
+      input.assumedIndexReturn ??
+      plan.assumedIndexReturn ??
+      "";
+  
+    return `ผลตอบแทนคาดหวังจากดัชนี ${assumedReturnText(assumedReturn)}% ต่อปี`;
+  }
+  
+  function updateAssumptionText(quote) {
+    const text = getAssumptionText(quote);
+  
+    setText("benefit-assumption-line", text);
+  
+    const chartNote = $("chart-note");
+    if (chartNote) {
+      chartNote.textContent =
+        `แสดงเบี้ยสะสมเทียบกับผลประโยชน์รวมรายปี • ${text}`;
+    }
+  }
+
   function formatInputNumber(value) {
   const n = Number(value) || 0;
   const rounded = Math.round((n + Number.EPSILON) * 100) / 100;
@@ -1209,6 +1248,7 @@
     renderTaxDisplayState(quote);
     renderYearlyTable(quote);
     renderBenefitChart(quote);
+    updateAssumptionText(quote);
   }
 
   function renderLiveSummary(quote) {
