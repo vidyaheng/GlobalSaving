@@ -856,7 +856,7 @@ tbody tr:last-child td {
    Benefit Summary Fine Tune
 ========================= */
 
-.benefit-main-value strong,
+,
 #report-total-benefit,
 .benefit-mini-grid strong {
   display: inline-block;
@@ -1542,7 +1542,7 @@ tbody tr:last-child td {
   font-weight: 650;
 }
 
-.benefit-main-value strong {
+ {
   display: block;
   color: #0b4d94;
   font-size: clamp(1.45rem, 2.5vw, 2.1rem);
@@ -2328,8 +2328,8 @@ tbody tr:last-child td {
   
   .benefit-main-value strong {
     color: #0b4d94 !important;
-    font-size: 11.5pt !important;
-    font-weight: 780 !important;
+    font-size: 10.8pt !important;
+    font-weight: 760 !important;
     line-height: 1.12 !important;
   }
   
@@ -2411,12 +2411,10 @@ tbody tr:last-child td {
   .gs-chart-side-panel {
     order: -1 !important;
     display: grid !important;
-    grid-template-columns: 155px minmax(0, 1fr) !important;
-    grid-template-areas:
-      "meta values"
-      "year irr" !important;
-    gap: 4px 18px !important;
-    align-items: start !important;
+    grid-template-columns: 140px repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: auto auto !important;
+    gap: 6px 16px !important;
+    align-items: end !important;
   
     padding: 0 0 12px !important;
     border-radius: 0 !important;
@@ -2426,102 +2424,110 @@ tbody tr:last-child td {
     border-bottom: 1px solid #e5e7eb !important;
   }
   
+  .gs-chart-side-panel h3,
+  .gs-chart-selected-year,
+  .gs-chart-value-list,
+  .gs-chart-irr-list {
+    all: unset;
+  }
+  
   .gs-chart-side-panel h3 {
-    grid-area: meta !important;
-    margin: 0 !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
     color: #0f172a !important;
     font-size: 10.5pt !important;
     font-weight: 850 !important;
-    text-align: left !important;
     line-height: 1.2 !important;
   }
   
   .gs-chart-selected-year {
-    grid-area: year !important;
-    margin: 0 !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
     color: #64748b !important;
     font-size: 8.4pt !important;
     font-weight: 500 !important;
-    text-align: left !important;
     line-height: 1.2 !important;
   }
   
   .gs-chart-value-list {
-    grid-area: values !important;
+    grid-column: 2 / 5 !important;
+    grid-row: 1 / 3 !important;
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 14px !important;
-    align-items: start !important;
+    grid-template-rows: auto auto !important;
+    gap: 6px 16px !important;
+    align-items: end !important;
   }
   
   .gs-chart-value-item {
-    display: grid !important;
-    grid-template-columns: 9px minmax(0, 1fr) !important;
-    gap: 6px !important;
-    align-items: start !important;
+    display: contents !important;
   }
   
   .gs-chart-color-dot {
-    width: 7px !important;
-    height: 7px !important;
-    margin: 16px 0 0 !important;
-    box-shadow: none !important;
+    display: none !important;
   }
   
   .gs-chart-value-item p {
-    margin: 0 0 2px !important;
-    color: #64748b !important;
-    font-size: 8pt !important;
-    font-weight: 600 !important;
+    margin: 0 !important;
+    color: #111827 !important;
+    font-size: 8.4pt !important;
+    font-weight: 700 !important;
     line-height: 1.15 !important;
   }
   
   .gs-chart-value-item strong {
-    color: currentColor !important;
-    font-size: 11pt !important;
+    display: block !important;
+    margin: 0 !important;
+    font-size: 10.8pt !important;
     font-weight: 850 !important;
     line-height: 1.15 !important;
+    white-space: nowrap !important;
   }
   
-  .gs-chart-value-item.death {
+  .gs-chart-value-item.death p,
+  .gs-chart-value-item.death strong {
     color: #2f80ed !important;
   }
   
-  .gs-chart-value-item.surrender {
+  .gs-chart-value-item.surrender p,
+  .gs-chart-value-item.surrender strong {
     color: #f59e0b !important;
   }
   
-  .gs-chart-value-item.premium {
+  .gs-chart-value-item.premium p,
+  .gs-chart-value-item.premium strong {
     color: #178a2f !important;
   }
   
   .gs-chart-irr-list {
-    grid-area: irr !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    display: flex !important;
-    gap: 28px !important;
-    align-items: baseline !important;
-    justify-content: flex-start !important;
+    grid-column: 5 !important;
+    grid-row: 1 / 3 !important;
+    display: grid !important;
+    grid-template-rows: auto auto !important;
+    gap: 6px !important;
+    align-items: end !important;
+    justify-items: start !important;
   }
   
   .gs-chart-irr-list div {
-    display: flex !important;
-    gap: 8px !important;
-    align-items: baseline !important;
+    display: contents !important;
   }
   
   .gs-chart-irr-list span {
-    color: #64748b !important;
-    font-size: 8pt !important;
-    font-weight: 600 !important;
+    margin: 0 !important;
+    color: #111827 !important;
+    font-size: 8.4pt !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
   }
   
   .gs-chart-irr-list strong {
+    margin: 0 !important;
     color: #0f172a !important;
-    font-size: 10pt !important;
+    font-size: 10.8pt !important;
     font-weight: 850 !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
   }
   
   .gs-benefit-chart-card {
