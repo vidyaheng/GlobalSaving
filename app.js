@@ -673,6 +673,21 @@
       "report-irr-label",
       taxIncluded ? "IRR หลังภาษี" : "IRR เมื่อครบสัญญา"
     );
+  
+    const totalHeaderText = taxIncluded
+      ? "ผลรวม<br />หลังภาษี"
+      : "ผลประโยชน์<br />รวม";
+  
+    const surrenderTotalHeader = $("th-surrender-total-label");
+    const deathTotalHeader = $("th-death-total-label");
+  
+    if (surrenderTotalHeader) {
+      surrenderTotalHeader.innerHTML = totalHeaderText;
+    }
+  
+    if (deathTotalHeader) {
+      deathTotalHeader.innerHTML = totalHeaderText;
+    }
   }
 
   // =============================
