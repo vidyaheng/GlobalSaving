@@ -1115,47 +1115,87 @@
     `;
   
     const svg = container.querySelector(".gs-benefit-chart-svg");
-    if (!svg) return;
-  
-    const updateSelectedIndexFromEvent = (event) => {
-      const rect = svg.getBoundingClientRect();
-      const svgX = ((event.clientX - rect.left) / rect.width) * width;
-      const ratio = (svgX - margin.left) / chartWidth;
-      const nextIndex = clampIndex(Math.round(ratio * finalIndex), finalIndex);
-  
-      if (nextIndex === selectedIndex) return;
-  
-      container.dataset.selectedIndex = String(nextIndex);
-      renderBenefitChart(quote);
-    };
-  
-    let isDragging = false;
-  
-    svg.addEventListener("pointerdown", (event) => {
-      isDragging = true;
-      svg.setPointerCapture?.(event.pointerId);
-      updateSelectedIndexFromEvent(event);
-    });
-  
-    svg.addEventListener("pointermove", (event) => {
-      if (!isDragging) return;
-      updateSelectedIndexFromEvent(event);
-    });
-  
-    svg.addEventListener("pointerup", () => {
-      isDragging = false;
-    });
-  
-    svg.addEventListener("pointercancel", () => {
-      isDragging = false;
-    });
-  
-    svg.addEventListener("pointerleave", () => {
-      isDragging = false;
-    });
-  
-    svg.addEventListener("click", updateSelectedIndexFromEvent);
-  }
+      if (!svg) return;
+      
+      const getEventClientX = (event) => {
+        if (event.touches && event.touches.length) {
+          return event.touches[0].clientX;
+        }
+      
+        if (event.changedTouches && event.changedTouches.length) {
+          return event.changedTouches[0].clientX;
+        }
+      
+        return event.clientX;
+      };
+      
+      const updateSelectedIndexFromEvent = (event) => {
+        const currentSvg = container.querySelector(".gs-benefit-chart-svg");
+        if (!currentSvg) return;
+      
+        const clientX = getEventClientX(event);
+        const rect = currentSvg.getBoundingClientRect();
+      
+        const rawX = clientX - rect.left;
+        const clampedX = Math.max(0, Math.min(rawX, rect.width));
+        const svgX = (clampedX / rect.width) * width;
+      
+        const ratio = (svgX - margin.left) / chartWidth;
+        const nextIndex = clampIndex(Math.round(ratio * finalIndex), finalIndex);
+      
+        const currentIndex = Number(container.dataset.selectedIndex ?? finalIndex);
+      
+        if (nextIndex === currentIndex) return;
+      
+        container.dataset.selectedIndex = String(nextIndex);
+        renderBenefitChart(quote);
+      };
+      
+      const startDrag = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      
+        document.body.style.userSelect = "none";
+      
+        const handleMove = (moveEvent) => {
+          moveEvent.preventDefault();
+          updateSelectedIndexFromEvent(moveEvent);
+        };
+      
+        const stopDrag = () => {
+          document.body.style.userSelect = "";
+      
+          window.removeEventListener("pointermove", handleMove);
+          window.removeEventListener("pointerup", stopDrag);
+          window.removeEventListener("pointercancel", stopDrag);
+      
+          window.removeEventListener("mousemove", handleMove);
+          window.removeEventListener("mouseup", stopDrag);
+      
+          window.removeEventListener("touchmove", handleMove);
+          window.removeEventListener("touchend", stopDrag);
+          window.removeEventListener("touchcancel", stopDrag);
+        };
+      
+        // สำคัญ: ต้อง bind move ก่อน update เพราะ update จะ render svg ใหม่
+        window.addEventListener("pointermove", handleMove, { passive: false });
+        window.addEventListener("pointerup", stopDrag, { once: true });
+        window.addEventListener("pointercancel", stopDrag, { once: true });
+      
+        window.addEventListener("mousemove", handleMove, { passive: false });
+        window.addEventListener("mouseup", stopDrag, { once: true });
+      
+        window.addEventListener("touchmove", handleMove, { passive: false });
+        window.addEventListener("touchend", stopDrag, { once: true });
+        window.addEventListener("touchcancel", stopDrag, { once: true });
+      
+        updateSelectedIndexFromEvent(event);
+      };
+      
+      svg.addEventListener("pointerdown", startDrag);
+      svg.addEventListener("mousedown", startDrag);
+      svg.addEventListener("touchstart", startDrag, { passive: false });
+      svg.addEventListener("click", updateSelectedIndexFromEvent);
 
   // =============================
   // Render quote
