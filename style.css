@@ -2024,7 +2024,8 @@ tbody tr:last-child td {
     background: #ffffff !important;
   }
 
-  #result-section {
+  #result-section,
+  #tab-chart {
     display: block !important;
   }
 
@@ -2046,6 +2047,11 @@ tbody tr:last-child td {
     background: #ffffff !important;
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+
+  .yearly-table-section {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
 
   .report-cover {
@@ -2086,20 +2092,31 @@ tbody tr:last-child td {
     color: #111827 !important;
   }
 
+  /* =========================
+     PDF Table
+  ========================= */
+
   .table-wrap {
-    overflow: visible;
-    border-radius: 0;
-    border: 0;
+    overflow: hidden !important;
+    border: 1px solid #cfd8e3 !important;
+    border-radius: 0 !important;
   }
 
   table {
     min-width: 0;
     width: 100%;
     font-size: 9px;
+    border-collapse: collapse !important;
   }
 
   .benefit-table {
     min-width: 0 !important;
+    border-collapse: collapse !important;
+  }
+
+  .benefit-table th,
+  .benefit-table td {
+    border: 1px solid #d8e0ea !important;
   }
 
   th,
@@ -2124,18 +2141,18 @@ tbody tr:last-child td {
   }
 
   .total-cell {
-    color: #111827 !important;
+    color: #0b4d94 !important;
     background: #ffffff !important;
-    font-weight: 800;
+    font-weight: 750 !important;
   }
 
   .zero-cell {
     color: #6b7280 !important;
   }
 
-    /* =========================
-       PDF Layout Refinement
-    ========================= */
+  /* =========================
+     PDF Layout Refinement
+  ========================= */
 
   .report-cover.report-hero {
     padding: 0 0 10px !important;
@@ -2145,9 +2162,13 @@ tbody tr:last-child td {
 
   .report-hero-top {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 245px !important;
-    gap: 18px !important;
+    grid-template-columns: minmax(0, 1fr) 220px !important;
+    gap: 16px !important;
     align-items: start !important;
+  }
+
+  .report-title-block {
+    min-width: 0 !important;
   }
 
   .report-title-block .eyebrow {
@@ -2157,23 +2178,24 @@ tbody tr:last-child td {
   .report-title-block h2 {
     margin: 0 0 4px !important;
     color: #1f2aa8 !important;
-    font-size: 18pt !important;
+    font-size: 14.2pt !important;
     font-weight: 850 !important;
-    line-height: 1.18 !important;
-    letter-spacing: -0.02em !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.045em !important;
+    white-space: nowrap !important;
   }
 
   .report-plan-line {
     margin: 0 !important;
     color: #e11d48 !important;
-    font-size: 13pt !important;
+    font-size: 12.2pt !important;
     font-weight: 800 !important;
-    line-height: 1.28 !important;
+    line-height: 1.25 !important;
   }
 
   .report-code-pill {
     padding: 1px 7px !important;
-    font-size: 8.5pt !important;
+    font-size: 8.2pt !important;
     vertical-align: middle !important;
   }
 
@@ -2181,40 +2203,40 @@ tbody tr:last-child td {
     width: 100% !important;
     justify-self: end !important;
     display: grid !important;
-    gap: 2px !important;
-    padding-top: 2px !important;
+    gap: 1px !important;
+    padding-top: 1px !important;
   }
 
   .client-row {
     display: grid !important;
-    grid-template-columns: 70px minmax(0, 1fr) !important;
-    gap: 8px !important;
+    grid-template-columns: 66px minmax(0, 1fr) !important;
+    gap: 7px !important;
     padding: 1px 0 !important;
     align-items: baseline !important;
   }
 
   .client-row span {
     color: #64748b !important;
-    font-size: 7.8pt !important;
+    font-size: 7.5pt !important;
     font-weight: 500 !important;
   }
 
   .client-row strong {
     color: #0f3f7a !important;
-    font-size: 8.2pt !important;
+    font-size: 8pt !important;
     font-weight: 650 !important;
-    line-height: 1.25 !important;
+    line-height: 1.22 !important;
   }
 
   .customer-row strong {
     color: #0f172a !important;
-    font-size: 8.8pt !important;
+    font-size: 8.6pt !important;
     font-weight: 800 !important;
   }
 
   .hero-accent-line {
     height: 1px !important;
-    margin: 12px 0 12px !important;
+    margin: 11px 0 12px !important;
     background: linear-gradient(
       90deg,
       rgba(15, 94, 168, 0.45),
@@ -2240,12 +2262,15 @@ tbody tr:last-child td {
   .plan-metric strong,
   .plan-metric.major strong {
     color: #0f172a !important;
-    font-size: 13pt !important;
+    font-size: 12.8pt !important;
     font-weight: 750 !important;
-    line-height: 1.22 !important;
+    line-height: 1.2 !important;
   }
 
-  /* Benefit summary: no card box, more like top plan info */
+  /* =========================
+     PDF Benefit Summary
+  ========================= */
+
   .benefit-summary-section {
     padding: 12px 0 0 !important;
     border: 0 !important;
@@ -2255,10 +2280,10 @@ tbody tr:last-child td {
 
   .benefit-clean-header {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 245px !important;
+    grid-template-columns: minmax(0, 1fr) 260px !important;
     gap: 18px !important;
     align-items: end !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 10px !important;
   }
 
   .benefit-clean-header .eyebrow {
@@ -2271,7 +2296,7 @@ tbody tr:last-child td {
     margin: 0 !important;
     font-size: 15pt !important;
     font-weight: 850 !important;
-    line-height: 1.2 !important;
+    line-height: 1.18 !important;
   }
 
   .benefit-main-value {
@@ -2293,20 +2318,23 @@ tbody tr:last-child td {
 
   .benefit-main-value strong {
     color: #0b4d94 !important;
-    font-size: 15pt !important;
-    font-weight: 850 !important;
-    line-height: 1.15 !important;
+    font-size: 14pt !important;
+    font-weight: 820 !important;
+    line-height: 1.12 !important;
   }
 
   .benefit-mini-grid {
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 14px !important;
-    padding-top: 8px !important;
+    width: 100% !important;
+    max-width: none !important;
+    gap: 18px !important;
+    padding-top: 10px !important;
     border-top: 1px solid #e5e7eb !important;
   }
 
   .benefit-mini-grid > div {
+    min-width: 0 !important;
     padding: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -2323,15 +2351,18 @@ tbody tr:last-child td {
 
   .benefit-mini-grid strong {
     color: #0f3f7a !important;
-    font-size: 12pt !important;
-    font-weight: 800 !important;
+    font-size: 11.5pt !important;
+    font-weight: 780 !important;
   }
 
   .disclaimer {
     display: none !important;
   }
 
-  /* Chart PDF layout: info box horizontal before chart */
+  /* =========================
+     PDF Chart Layout
+  ========================= */
+
   #tab-chart {
     display: block !important;
     padding-top: 10px !important;
@@ -2349,13 +2380,13 @@ tbody tr:last-child td {
   }
 
   .chart-card-header h3 {
-    font-size: 15pt !important;
+    font-size: 18pt !important;
     margin: 0 0 2px !important;
   }
 
   .chart-card-header .muted,
   #chart-note {
-    font-size: 8pt !important;
+    font-size: 9pt !important;
   }
 
   .chart-box {
@@ -2369,17 +2400,19 @@ tbody tr:last-child td {
   .gs-benefit-chart-layout {
     display: flex !important;
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
 
   .gs-chart-side-panel {
     order: -1 !important;
     display: grid !important;
-    grid-template-columns: 1.1fr 2.4fr 1.45fr !important;
-    gap: 10px !important;
+    grid-template-columns: 1.15fr 1fr 1fr 1fr !important;
+    grid-template-areas:
+      "meta death surrender premium"
+      "meta irr irr irr" !important;
+    gap: 10px 14px !important;
     align-items: end !important;
-
-    padding: 0 0 8px !important;
+    padding: 0 0 12px !important;
     border-radius: 0 !important;
     background: #ffffff !important;
     color: #0f172a !important;
@@ -2388,29 +2421,31 @@ tbody tr:last-child td {
   }
 
   .gs-chart-side-panel h3 {
-    grid-column: 1 !important;
+    grid-area: meta !important;
     margin: 0 !important;
     color: #0f172a !important;
-    font-size: 10pt !important;
+    font-size: 11pt !important;
     font-weight: 850 !important;
     text-align: left !important;
   }
 
   .gs-chart-selected-year {
-    grid-column: 1 !important;
-    margin: 2px 0 0 !important;
+    grid-area: meta !important;
+    align-self: end !important;
+    margin: 0 !important;
+    padding-top: 18px !important;
     color: #64748b !important;
-    font-size: 8pt !important;
+    font-size: 8.5pt !important;
     font-weight: 500 !important;
     text-align: left !important;
   }
 
   .gs-chart-value-list {
-    grid-column: 2 !important;
-    grid-row: 1 / span 2 !important;
+    grid-column: 2 / 5 !important;
+    grid-row: 1 !important;
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 10px !important;
+    gap: 12px !important;
   }
 
   .gs-chart-value-item {
@@ -2430,13 +2465,13 @@ tbody tr:last-child td {
   .gs-chart-value-item p {
     margin: 0 0 2px !important;
     color: #64748b !important;
-    font-size: 7.5pt !important;
+    font-size: 8pt !important;
     font-weight: 600 !important;
   }
 
   .gs-chart-value-item strong {
     color: currentColor !important;
-    font-size: 9pt !important;
+    font-size: 11pt !important;
     font-weight: 850 !important;
     line-height: 1.15 !important;
   }
@@ -2454,31 +2489,31 @@ tbody tr:last-child td {
   }
 
   .gs-chart-irr-list {
-    grid-column: 3 !important;
-    grid-row: 1 / span 2 !important;
+    grid-column: 2 / 5 !important;
+    grid-row: 2 !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
-    display: grid !important;
-    gap: 4px !important;
+    display: flex !important;
+    gap: 28px !important;
+    align-items: baseline !important;
   }
 
   .gs-chart-irr-list div {
     display: flex !important;
-    justify-content: space-between !important;
     gap: 8px !important;
     align-items: baseline !important;
   }
 
   .gs-chart-irr-list span {
     color: #64748b !important;
-    font-size: 7.5pt !important;
+    font-size: 8pt !important;
     font-weight: 600 !important;
   }
 
   .gs-chart-irr-list strong {
     color: #0f172a !important;
-    font-size: 8.8pt !important;
+    font-size: 10pt !important;
     font-weight: 850 !important;
   }
 
@@ -2495,6 +2530,6 @@ tbody tr:last-child td {
   }
 
   .gs-benefit-chart-svg {
-    max-height: 130mm !important;
+    max-height: 148mm !important;
   }
 }
