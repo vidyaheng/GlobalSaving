@@ -2150,6 +2150,11 @@ tbody tr:last-child td {
     color: #6b7280 !important;
   }
 
+  .benefit-table .total-cell.zero-cell {
+    color: #0b4d94 !important;
+    font-weight: 750 !important;
+  }
+
   /* =========================
      PDF Layout Refinement
   ========================= */
@@ -2270,85 +2275,85 @@ tbody tr:last-child td {
   /* =========================
      PDF Benefit Summary
   ========================= */
-
+  
   .benefit-summary-section {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px 18px !important;
     padding: 12px 0 0 !important;
     border: 0 !important;
     background: #ffffff !important;
     box-shadow: none !important;
   }
-
+  
   .benefit-clean-header {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 260px !important;
-    gap: 18px !important;
-    align-items: end !important;
-    margin-bottom: 10px !important;
+    display: contents !important;
   }
-
+  
+  .benefit-clean-header > div:first-child {
+    grid-column: 1 / -1 !important;
+  }
+  
   .benefit-clean-header .eyebrow {
     margin-bottom: 3px !important;
     font-size: 8pt !important;
     letter-spacing: 0.08em !important;
   }
-
+  
   .benefit-clean-header h3 {
     margin: 0 !important;
     font-size: 15pt !important;
     font-weight: 850 !important;
     line-height: 1.18 !important;
   }
-
+  
   .benefit-main-value {
-    padding: 0 !important;
+    grid-column: 1 !important;
+    padding: 8px 0 0 !important;
     border: 0 !important;
+    border-top: 1px solid #e5e7eb !important;
     border-radius: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
-    text-align: right !important;
+    text-align: left !important;
     overflow: visible !important;
   }
-
+  
   .benefit-main-value span {
     margin-bottom: 3px !important;
     color: #64748b !important;
     font-size: 8pt !important;
     font-weight: 500 !important;
   }
-
+  
   .benefit-main-value strong {
     color: #0b4d94 !important;
-    font-size: 14pt !important;
-    font-weight: 820 !important;
+    font-size: 11.5pt !important;
+    font-weight: 780 !important;
     line-height: 1.12 !important;
   }
-
+  
   .benefit-mini-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    width: 100% !important;
-    max-width: none !important;
-    gap: 18px !important;
-    padding-top: 10px !important;
-    border-top: 1px solid #e5e7eb !important;
+    display: contents !important;
   }
-
+  
   .benefit-mini-grid > div {
     min-width: 0 !important;
-    padding: 0 !important;
+    padding: 8px 0 0 !important;
     border: 0 !important;
+    border-top: 1px solid #e5e7eb !important;
     border-radius: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
   }
-
+  
   .benefit-mini-grid span {
     margin-bottom: 3px !important;
     color: #64748b !important;
     font-size: 8pt !important;
     font-weight: 500 !important;
   }
-
+  
   .benefit-mini-grid strong {
     color: #0f3f7a !important;
     font-size: 11.5pt !important;
@@ -2362,33 +2367,33 @@ tbody tr:last-child td {
   /* =========================
      PDF Chart Layout
   ========================= */
-
+  
   #tab-chart {
     display: block !important;
     padding-top: 10px !important;
   }
-
+  
   .chart-card {
     padding: 0 !important;
     border: 0 !important;
     background: #ffffff !important;
     box-shadow: none !important;
   }
-
+  
   .chart-card-header {
-    margin-bottom: 8px !important;
+    margin-bottom: 10px !important;
   }
-
+  
   .chart-card-header h3 {
     font-size: 18pt !important;
     margin: 0 0 2px !important;
   }
-
+  
   .chart-card-header .muted,
   #chart-note {
     font-size: 9pt !important;
   }
-
+  
   .chart-box {
     padding: 0 !important;
     border: 0 !important;
@@ -2396,22 +2401,23 @@ tbody tr:last-child td {
     background: #ffffff !important;
     overflow: visible !important;
   }
-
+  
   .gs-benefit-chart-layout {
     display: flex !important;
     flex-direction: column !important;
     gap: 12px !important;
   }
-
+  
   .gs-chart-side-panel {
     order: -1 !important;
     display: grid !important;
-    grid-template-columns: 1.15fr 1fr 1fr 1fr !important;
+    grid-template-columns: 155px minmax(0, 1fr) !important;
     grid-template-areas:
-      "meta death surrender premium"
-      "meta irr irr irr" !important;
-    gap: 10px 14px !important;
-    align-items: end !important;
+      "meta values"
+      "year irr" !important;
+    gap: 4px 18px !important;
+    align-items: start !important;
+  
     padding: 0 0 12px !important;
     border-radius: 0 !important;
     background: #ffffff !important;
@@ -2419,104 +2425,105 @@ tbody tr:last-child td {
     box-shadow: none !important;
     border-bottom: 1px solid #e5e7eb !important;
   }
-
+  
   .gs-chart-side-panel h3 {
     grid-area: meta !important;
     margin: 0 !important;
     color: #0f172a !important;
-    font-size: 11pt !important;
+    font-size: 10.5pt !important;
     font-weight: 850 !important;
     text-align: left !important;
+    line-height: 1.2 !important;
   }
-
+  
   .gs-chart-selected-year {
-    grid-area: meta !important;
-    align-self: end !important;
+    grid-area: year !important;
     margin: 0 !important;
-    padding-top: 18px !important;
     color: #64748b !important;
-    font-size: 8.5pt !important;
+    font-size: 8.4pt !important;
     font-weight: 500 !important;
     text-align: left !important;
+    line-height: 1.2 !important;
   }
-
+  
   .gs-chart-value-list {
-    grid-column: 2 / 5 !important;
-    grid-row: 1 !important;
+    grid-area: values !important;
     display: grid !important;
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 12px !important;
+    gap: 14px !important;
+    align-items: start !important;
   }
-
+  
   .gs-chart-value-item {
     display: grid !important;
-    grid-template-columns: 10px minmax(0, 1fr) !important;
+    grid-template-columns: 9px minmax(0, 1fr) !important;
     gap: 6px !important;
     align-items: start !important;
   }
-
+  
   .gs-chart-color-dot {
     width: 7px !important;
     height: 7px !important;
-    margin: 18px 0 0 !important;
+    margin: 16px 0 0 !important;
     box-shadow: none !important;
   }
-
+  
   .gs-chart-value-item p {
     margin: 0 0 2px !important;
     color: #64748b !important;
     font-size: 8pt !important;
     font-weight: 600 !important;
+    line-height: 1.15 !important;
   }
-
+  
   .gs-chart-value-item strong {
     color: currentColor !important;
     font-size: 11pt !important;
     font-weight: 850 !important;
     line-height: 1.15 !important;
   }
-
+  
   .gs-chart-value-item.death {
     color: #2f80ed !important;
   }
-
+  
   .gs-chart-value-item.surrender {
     color: #f59e0b !important;
   }
-
+  
   .gs-chart-value-item.premium {
     color: #178a2f !important;
   }
-
+  
   .gs-chart-irr-list {
-    grid-column: 2 / 5 !important;
-    grid-row: 2 !important;
+    grid-area: irr !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
     display: flex !important;
     gap: 28px !important;
     align-items: baseline !important;
+    justify-content: flex-start !important;
   }
-
+  
   .gs-chart-irr-list div {
     display: flex !important;
     gap: 8px !important;
     align-items: baseline !important;
   }
-
+  
   .gs-chart-irr-list span {
     color: #64748b !important;
     font-size: 8pt !important;
     font-weight: 600 !important;
   }
-
+  
   .gs-chart-irr-list strong {
     color: #0f172a !important;
     font-size: 10pt !important;
     font-weight: 850 !important;
   }
-
+  
   .gs-benefit-chart-card {
     padding: 0 !important;
     border: 0 !important;
@@ -2524,12 +2531,12 @@ tbody tr:last-child td {
     background: #ffffff !important;
     box-shadow: none !important;
   }
-
+  
   .gs-chart-hint {
     display: none !important;
   }
-
+  
   .gs-benefit-chart-svg {
-    max-height: 148mm !important;
+    max-height: 146mm !important;
   }
 }
