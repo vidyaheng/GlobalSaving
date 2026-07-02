@@ -2411,7 +2411,7 @@ tbody tr:last-child td {
   .gs-benefit-chart-layout {
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
+    gap: 22px !important;
   }
   
   .gs-chart-side-panel {
