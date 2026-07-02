@@ -2589,3 +2589,7 @@ tbody tr:last-child td {
     overflow: hidden !important;
   }
 }
+
+.nowrap {
+  white-space: nowrap;
+}
