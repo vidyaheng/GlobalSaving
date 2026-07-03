@@ -2849,6 +2849,23 @@ tbody tr:last-child td {
   margin-top: 0.45rem;
 }
 
+.discount-help-popup-inner > div {
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+}
+
+.discount-help-popup-inner > div:nth-child(1) {
+  color: #15803d;
+  background: #f0fdf4;
+  font-weight: 700;
+}
+
+.discount-help-popup-inner > div:nth-child(2) {
+  color: #2563eb;
+  background: #eff6ff;
+  font-weight: 700;
+}
+
 /* ================================
    Active / inactive choice colors
 ================================ */
