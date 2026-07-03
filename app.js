@@ -1578,3 +1578,36 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
+// ================================
+// Choice cards: plan + gender
+// ================================
+function initChoiceCards() {
+  const choiceCards = document.querySelectorAll(".choice-card[data-target][data-value]");
+
+  choiceCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const targetId = card.dataset.target;
+      const value = card.dataset.value;
+      const targetSelect = document.getElementById(targetId);
+
+      if (!targetSelect) return;
+
+      targetSelect.value = value;
+
+      const groupCards = document.querySelectorAll(
+        `.choice-card[data-target="${targetId}"]`
+      );
+
+      groupCards.forEach((item) => {
+        const isActive = item === card;
+        item.classList.toggle("is-active", isActive);
+        item.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+
+      targetSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initChoiceCards);
