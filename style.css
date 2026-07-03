@@ -2596,28 +2596,19 @@ tbody tr:last-child td {
 
 /* ================================
    Choice cards: plan + gender
+   วางท้ายสุดของ style.css
 ================================ */
 
-:root {
-  --plan-15: #2563eb;
-  --plan-15-soft: #eff6ff;
-
-  --plan-25: #0f766e;
-  --plan-25-soft: #f0fdfa;
-
-  --male: #0ea5e9;
-  --male-soft: #f0f9ff;
-
-  --female: #ec4899;
-  --female-soft: #fdf2f8;
-}
-
 .native-select-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  appearance: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .choice-field {
@@ -2627,17 +2618,16 @@ tbody tr:last-child td {
 .choice-grid {
   display: grid;
   gap: 0.75rem;
+  width: 100%;
 }
 
-.plan-choice-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
+.plan-choice-grid,
 .gender-choice-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .choice-card {
+  appearance: none;
   width: 100%;
   min-height: 72px;
   display: flex;
@@ -2650,6 +2640,8 @@ tbody tr:last-child td {
   color: #0f172a;
   cursor: pointer;
   text-align: left;
+  font-family: inherit;
+  box-shadow: none;
   transition:
     border-color 0.18s ease,
     background 0.18s ease,
@@ -2698,23 +2690,23 @@ tbody tr:last-child td {
 
 /* Plan colors */
 .plan-card.plan-15.is-active {
-  border-color: var(--plan-15);
-  background: var(--plan-15-soft);
+  border-color: #2563eb;
+  background: #eff6ff;
 }
 
 .plan-card.plan-15 .choice-icon {
-  color: var(--plan-15);
-  background: var(--plan-15-soft);
+  color: #2563eb;
+  background: #eff6ff;
 }
 
 .plan-card.plan-25.is-active {
-  border-color: var(--plan-25);
-  background: var(--plan-25-soft);
+  border-color: #0f766e;
+  background: #f0fdfa;
 }
 
 .plan-card.plan-25 .choice-icon {
-  color: var(--plan-25);
-  background: var(--plan-25-soft);
+  color: #0f766e;
+  background: #f0fdfa;
 }
 
 /* Gender colors */
@@ -2723,23 +2715,23 @@ tbody tr:last-child td {
 }
 
 .gender-card.gender-male.is-active {
-  border-color: var(--male);
-  background: var(--male-soft);
+  border-color: #0ea5e9;
+  background: #f0f9ff;
 }
 
 .gender-card.gender-male .choice-icon {
-  color: var(--male);
-  background: var(--male-soft);
+  color: #0ea5e9;
+  background: #f0f9ff;
 }
 
 .gender-card.gender-female.is-active {
-  border-color: var(--female);
-  background: var(--female-soft);
+  border-color: #ec4899;
+  background: #fdf2f8;
 }
 
 .gender-card.gender-female .choice-icon {
-  color: var(--female);
-  background: var(--female-soft);
+  color: #ec4899;
+  background: #fdf2f8;
 }
 
 .gender-symbol {
@@ -2747,7 +2739,6 @@ tbody tr:last-child td {
   font-weight: 700;
 }
 
-/* Mobile */
 @media (max-width: 640px) {
   .plan-choice-grid,
   .gender-choice-grid {
