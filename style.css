@@ -2921,3 +2921,32 @@ tbody tr:last-child td {
   border-color: #93c5fd !important;
   background: #eff6ff !important;
 }
+
+/* ================================
+   Compact gender choice cards
+================================ */
+
+.gender-choice-grid {
+  gap: 0.75rem;
+}
+
+.gender-card {
+  min-height: 52px;
+  padding: 0.55rem 0.85rem;
+  border-radius: 16px;
+}
+
+.gender-card .choice-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 12px;
+}
+
+.gender-symbol {
+  font-size: 1.45rem;
+}
+
+.gender-card .choice-text strong {
+  font-size: 0.95rem;
+}
