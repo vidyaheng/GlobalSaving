@@ -856,7 +856,7 @@ tbody tr:last-child td {
    Benefit Summary Fine Tune
 ========================= */
 
-,
+
 #report-total-benefit,
 .benefit-mini-grid strong {
   display: inline-block;
@@ -1542,7 +1542,7 @@ tbody tr:last-child td {
   font-weight: 650;
 }
 
- {
+ .benefit-main-value strong {
   display: block;
   color: #0b4d94;
   font-size: clamp(1.45rem, 2.5vw, 2.1rem);
@@ -2834,7 +2834,7 @@ tbody tr:last-child td {
 
 .discount-help-popup-inner div + div {
   margin-top: 0.45rem;
-
+}
 
 /* ================================
    Active / inactive choice colors
@@ -2880,25 +2880,14 @@ tbody tr:last-child td {
    Tax option chips
 ================================ */
 
-.tax-option,
-.tax-chip,
-.radio-chip {
-  color: #64748b;
+.quote-form .tax-radio-group > label.tax-radio {
+  color: #64748b !important;
+  border-color: #e2e8f0 !important;
+  background: #ffffff !important;
 }
 
-.tax-option:has(input:checked),
-.tax-chip:has(input:checked),
-.radio-chip:has(input:checked) {
-  color: #2563eb;
-  border-color: #93c5fd;
-  background: #eff6ff;
+.quote-form .tax-radio-group > label.tax-radio:has(input[type="radio"]:checked) {
+  color: #2563eb !important;
+  border-color: #93c5fd !important;
+  background: #eff6ff !important;
 }
-
-.tax-option:not(:has(input:checked)),
-.tax-chip:not(:has(input:checked)),
-.radio-chip:not(:has(input:checked)) {
-  color: #64748b;
-  border-color: #e2e8f0;
-  background: #ffffff;
-}
-
