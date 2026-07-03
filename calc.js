@@ -256,15 +256,16 @@
     const planId = input.planId;
     const plan = getSafePlan(planId);
   
-    const age = toNumber(input.age);
+    const ageRaw = String(input.age ?? "").trim();
+    const age = toNumber(ageRaw, NaN);
     const sumAssured = toNumber(input.sumAssured);
-  
+    
     if (!planId) {
       errors.push("กรุณาเลือกแผน");
     }
-  
-    if (!age || age <= 0) {
-      errors.push("กรุณาระบุอายุให้ถูกต้อง");
+    
+    if (ageRaw === "" || !Number.isFinite(age) || age < 0 || age > 75) {
+      errors.push("อายุรับประกันต้องอยู่ระหว่าง 1 เดือน ถึง 75 ปี");
     }
   
     if (!sumAssured || sumAssured <= 0) {
