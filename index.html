@@ -299,30 +299,21 @@
                 <div class="field-label-row">
                   <label for="sum-assured">ทุนประกัน</label>
               
-                  <span class="discount-help" id="discount-help">
-                    <button
-                      type="button"
+                  <details class="discount-help">
+                    <summary
                       class="discount-help-trigger"
-                      id="discount-help-trigger"
-                      aria-expanded="false"
-                      aria-controls="discount-help-popup"
                       aria-label="ดูเงื่อนไขส่วนลดเบี้ยประกัน"
                     >
-                      <span class="discount-help-icon">ℹ</span>
-                    </button>
+                      <span class="discount-help-icon">i</span>
+                    </summary>
               
-                    <div
-                      class="discount-help-popup"
-                      id="discount-help-popup"
-                      role="tooltip"
-                      hidden
-                    >
+                    <div class="discount-help-popup" role="tooltip">
                       <div class="discount-help-popup-inner">
                         <div>ทุนประกัน 100,000 - 499,999 บาท ได้รับส่วนลดเบี้ยประกัน 0.5%</div>
                         <div>ทุนประกันตั้งแต่ 500,000 บาทขึ้นไป ได้รับส่วนลดเบี้ยประกัน 1%</div>
                       </div>
                     </div>
-                  </span>
+                  </details>
                 </div>
               
                 <input id="sum-assured" name="sumAssured" type="number" />
