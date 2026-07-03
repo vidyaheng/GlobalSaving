@@ -2950,3 +2950,7 @@ tbody tr:last-child td {
 .gender-card .choice-text strong {
   font-size: 0.95rem;
 }
+
+#age {
+  min-height: 52px;
+}
