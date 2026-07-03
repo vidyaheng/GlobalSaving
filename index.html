@@ -351,12 +351,29 @@
               </div>
 
               <div class="field">
-                <label for="payout-option">การรับเงินระหว่างสัญญา</label>
+                <div class="field-label-row">
+                  <label for="payout-option">การรับเงินระหว่างสัญญา</label>
+              
+                  <details class="discount-help payout-help">
+                    <summary
+                      class="discount-help-trigger"
+                      aria-label="ดูคำอธิบายการรับเงินระหว่างสัญญา"
+                    >
+                      <span class="discount-help-icon">i</span>
+                    </summary>
+              
+                    <div class="discount-help-popup payout-help-popup" role="tooltip">
+                      <div class="discount-help-popup-inner payout-help-popup-inner">
+                        <div>ใช้กับเงินคืนรายปีและผลตอบแทนดัชนีที่ถึงกำหนดจ่าย</div>
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              
                 <select id="payout-option" name="payoutOption">
                   <option value="withdraw">รับเงินคืนตามรอบปี</option>
                   <option value="accumulate">ฝากสะสมไว้กับบริษัท 0.5% ต่อปี</option>
                 </select>
-                <small>ใช้กับเงินคืนรายปีและผลตอบแทนดัชนีที่ถึงกำหนดจ่าย</small>
               </div>
   
               <div class="field field-full">
