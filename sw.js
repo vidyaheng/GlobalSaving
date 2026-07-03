@@ -1,4 +1,4 @@
-const CACHE_NAME = "globalsaving-plus-pwa-v2";
+const CACHE_NAME = "globalsaving-plus-pwa-v3";
 
 const APP_SHELL = [
   "./",
@@ -16,8 +16,8 @@ const APP_SHELL = [
   "./icons/gsplus-icon-512.png",
   "./icons/gsplus-maskable-icon-192.png",
   "./icons/gsplus-maskable-icon-512.png",
-  "./icons/apple-touch-icon.png",
-  "./icons/favicon-32.png"
+  "./icons/gsplus-apple-touch-icon.png",
+  "./icons/gsplus-favicon-32.png"
 ];
 
 self.addEventListener("install", (event) => {
