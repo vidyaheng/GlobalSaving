@@ -2817,7 +2817,7 @@ tbody tr:last-child td {
   top: calc(100% + 10px);
   left: -16px;
   z-index: 30;
-  width: min(340px, 82vw);
+  width: min(420px, 88vw);
 }
 
 .discount-help-popup-inner {
