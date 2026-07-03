@@ -1542,7 +1542,7 @@ tbody tr:last-child td {
   font-weight: 650;
 }
 
- .benefit-main-value strong {
+.benefit-main-value strong {
   display: block;
   color: #0b4d94;
   font-size: clamp(1.45rem, 2.5vw, 2.1rem);
