@@ -2954,3 +2954,16 @@ tbody tr:last-child td {
 #age {
   min-height: 52px;
 }
+
+/* คำอธิบายของช่องการรับเงินระหว่างสัญญา */
+.payout-help-popup {
+  width: min(380px, 88vw);
+}
+
+.payout-help-popup-inner > div {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #475569;
+  font-weight: 600;
+}
