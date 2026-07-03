@@ -2767,6 +2767,19 @@ tbody tr:last-child td {
   transform: translateY(-1px);
 }
 
+.discount-help summary {
+  list-style: none;
+}
+
+.discount-help summary::-webkit-details-marker {
+  display: none;
+}
+
+.discount-help[open] .discount-help-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
 .discount-help-trigger {
   appearance: none;
   border: 0;
