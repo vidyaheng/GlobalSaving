@@ -137,20 +137,80 @@
   
           <form id="quote-form" class="quote-form">
             <div class="form-grid">
-              <div class="field field-full">
-                <label for="plan-id">แผน</label>
-                <select id="plan-id" name="planId" required>
+              <div class="field field-full choice-field">
+                <label>แผน</label>
+              
+                <select id="plan-id" name="planId" required class="native-select-hidden">
                   <option value="GS_15_8">Global Saving Plus 15/8</option>
                   <option value="GS_25_5">Global Saving Plus 25/5</option>
                 </select>
+              
+                <div class="choice-grid plan-choice-grid" role="radiogroup" aria-label="เลือกแผน">
+                  <button
+                    type="button"
+                    class="choice-card plan-card plan-15 is-active"
+                    data-target="plan-id"
+                    data-value="GS_15_8"
+                    aria-pressed="true"
+                  >
+                    <span class="choice-icon">📈</span>
+                    <span class="choice-text">
+                      <strong>Global Saving Plus 15/8</strong>
+                      <small>แผนเงินเติบโต · ชำระ 8 ปี</small>
+                    </span>
+                  </button>
+              
+                  <button
+                    type="button"
+                    class="choice-card plan-card plan-25"
+                    data-target="plan-id"
+                    data-value="GS_25_5"
+                    aria-pressed="false"
+                  >
+                    <span class="choice-icon">🏦</span>
+                    <span class="choice-text">
+                      <strong>Global Saving Plus 25/5</strong>
+                      <small>วางแผนระยะยาว · ชำระ 5 ปี</small>
+                    </span>
+                  </button>
+                </div>
               </div>
-  
-              <div class="field">
-                <label for="gender">เพศ</label>
-                <select id="gender" name="gender">
+              
+              <div class="field choice-field">
+                <label>เพศ</label>
+              
+                <select id="gender" name="gender" class="native-select-hidden">
                   <option value="male">ชาย</option>
                   <option value="female">หญิง</option>
                 </select>
+              
+                <div class="choice-grid gender-choice-grid" role="radiogroup" aria-label="เลือกเพศ">
+                  <button
+                    type="button"
+                    class="choice-card gender-card gender-male is-active"
+                    data-target="gender"
+                    data-value="male"
+                    aria-pressed="true"
+                  >
+                    <span class="choice-icon gender-symbol">♂</span>
+                    <span class="choice-text">
+                      <strong>ชาย</strong>
+                    </span>
+                  </button>
+              
+                  <button
+                    type="button"
+                    class="choice-card gender-card gender-female"
+                    data-target="gender"
+                    data-value="female"
+                    aria-pressed="false"
+                  >
+                    <span class="choice-icon gender-symbol">♀</span>
+                    <span class="choice-text">
+                      <strong>หญิง</strong>
+                    </span>
+                  </button>
+                </div>
               </div>
   
               <div class="field">
