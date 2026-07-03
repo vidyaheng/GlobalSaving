@@ -2982,3 +2982,24 @@ tbody tr:last-child td {
   left: auto;
   right: 20px;
 }
+
+/* ================================
+   Tax extra fields 2 columns
+================================ */
+
+.tax-extra-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.tax-extra-fields[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .tax-extra-fields {
+    grid-template-columns: 1fr;
+  }
+}
