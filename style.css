@@ -2593,3 +2593,168 @@ tbody tr:last-child td {
 .nowrap {
   white-space: nowrap;
 }
+
+/* ================================
+   Choice cards: plan + gender
+================================ */
+
+:root {
+  --plan-15: #2563eb;
+  --plan-15-soft: #eff6ff;
+
+  --plan-25: #0f766e;
+  --plan-25-soft: #f0fdfa;
+
+  --male: #0ea5e9;
+  --male-soft: #f0f9ff;
+
+  --female: #ec4899;
+  --female-soft: #fdf2f8;
+}
+
+.native-select-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-field {
+  gap: 0.45rem;
+}
+
+.choice-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.plan-choice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gender-choice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-card {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 18px;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.choice-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.choice-card.is-active {
+  border-width: 2px;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+}
+
+.choice-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  font-size: 1.35rem;
+  background: #f8fafc;
+}
+
+.choice-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  line-height: 1.25;
+}
+
+.choice-text strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.choice-text small {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* Plan colors */
+.plan-card.plan-15.is-active {
+  border-color: var(--plan-15);
+  background: var(--plan-15-soft);
+}
+
+.plan-card.plan-15 .choice-icon {
+  color: var(--plan-15);
+  background: var(--plan-15-soft);
+}
+
+.plan-card.plan-25.is-active {
+  border-color: var(--plan-25);
+  background: var(--plan-25-soft);
+}
+
+.plan-card.plan-25 .choice-icon {
+  color: var(--plan-25);
+  background: var(--plan-25-soft);
+}
+
+/* Gender colors */
+.gender-card {
+  min-height: 58px;
+}
+
+.gender-card.gender-male.is-active {
+  border-color: var(--male);
+  background: var(--male-soft);
+}
+
+.gender-card.gender-male .choice-icon {
+  color: var(--male);
+  background: var(--male-soft);
+}
+
+.gender-card.gender-female.is-active {
+  border-color: var(--female);
+  background: var(--female-soft);
+}
+
+.gender-card.gender-female .choice-icon {
+  color: var(--female);
+  background: var(--female-soft);
+}
+
+.gender-symbol {
+  font-size: 1.65rem;
+  font-weight: 700;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .plan-choice-grid,
+  .gender-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .choice-card {
+    min-height: 64px;
+  }
+}
