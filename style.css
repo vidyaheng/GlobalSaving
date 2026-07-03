@@ -2967,3 +2967,18 @@ tbody tr:last-child td {
   color: #475569;
   font-weight: 600;
 }
+
+/* ================================
+   Payout tooltip position fix
+================================ */
+
+.payout-help .discount-help-popup {
+  left: auto;
+  right: -16px;
+  z-index: 999;
+}
+
+.payout-help .discount-help-popup-inner::before {
+  left: auto;
+  right: 20px;
+}
