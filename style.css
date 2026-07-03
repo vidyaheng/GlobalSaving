@@ -2931,20 +2931,20 @@ tbody tr:last-child td {
 }
 
 .gender-card {
-  min-height: 52px;
-  padding: 0.55rem 0.85rem;
+  min-height: 54px;
+  padding: 0.45rem 0.8rem;
   border-radius: 16px;
 }
 
 .gender-card .choice-icon {
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
   border-radius: 12px;
 }
 
 .gender-symbol {
-  font-size: 1.45rem;
+  font-size: 1.4rem;
 }
 
 .gender-card .choice-text strong {
@@ -2952,5 +2952,5 @@ tbody tr:last-child td {
 }
 
 #age {
-  min-height: 72px;
+  min-height: 54px;
 }
