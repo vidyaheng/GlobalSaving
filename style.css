@@ -2764,6 +2764,7 @@ tbody tr:last-child td {
   position: relative;
   display: inline-flex;
   align-items: center;
+  transform: translateY(-1px);
 }
 
 .discount-help-trigger {
@@ -2833,4 +2834,71 @@ tbody tr:last-child td {
 
 .discount-help-popup-inner div + div {
   margin-top: 0.45rem;
+
+
+/* ================================
+   Active / inactive choice colors
+================================ */
+
+.choice-card .choice-text strong {
+  color: #64748b;
 }
+
+.choice-card .choice-text small {
+  color: #94a3b8;
+}
+
+.plan-card.plan-15.is-active .choice-text strong {
+  color: #2563eb;
+}
+
+.plan-card.plan-15.is-active .choice-text small {
+  color: #475569;
+}
+
+.plan-card.plan-25.is-active .choice-text strong {
+  color: #0f766e;
+}
+
+.plan-card.plan-25.is-active .choice-text small {
+  color: #475569;
+}
+
+.gender-card .choice-text strong {
+  color: #64748b;
+}
+
+.gender-card.gender-male.is-active .choice-text strong {
+  color: #0ea5e9;
+}
+
+.gender-card.gender-female.is-active .choice-text strong {
+  color: #ec4899;
+}
+
+/* ================================
+   Tax option chips
+================================ */
+
+.tax-option,
+.tax-chip,
+.radio-chip {
+  color: #64748b;
+}
+
+.tax-option:has(input:checked),
+.tax-chip:has(input:checked),
+.radio-chip:has(input:checked) {
+  color: #2563eb;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.tax-option:not(:has(input:checked)),
+.tax-chip:not(:has(input:checked)),
+.radio-chip:not(:has(input:checked)) {
+  color: #64748b;
+  border-color: #e2e8f0;
+  background: #ffffff;
+}
+
