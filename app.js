@@ -817,19 +817,80 @@
   function compactChartMoney(value) {
     const n = Number(value) || 0;
   
-    if (n >= 1000000) {
-      return `${(n / 1000000).toFixed(1)}ล.`;
+    if (n === 0) return "0";
+  
+    if (Math.abs(n) >= 100000) {
+      const millions = n / 1000000;
+      const text = millions.toLocaleString("th-TH", {
+        minimumFractionDigits: Number.isInteger(millions) ? 0 : 1,
+        maximumFractionDigits: 1
+      });
+  
+      return `${text} ล้าน`;
     }
   
-    if (n >= 100000) {
-      return `${(n / 100000).toFixed(1)}แสน`;
-    }
-  
-    if (n >= 1000) {
-      return `${Math.round(n / 1000)}k`;
+    if (Math.abs(n) >= 1000) {
+      return `${Math.round(n / 1000)} พัน`;
     }
   
     return String(Math.round(n));
+  }
+  
+  function niceChartStep(rawStep) {
+    const target = Number(rawStep) || 1;
+    const magnitude = 10 ** Math.floor(Math.log10(target));
+    const normalized = target / magnitude;
+  
+    let nice;
+  
+    if (normalized <= 1) {
+      nice = 1;
+    } else if (normalized <= 2) {
+      nice = 2;
+    } else if (normalized <= 2.5) {
+      nice = 2.5;
+    } else if (normalized <= 4) {
+      nice = 4;
+    } else if (normalized <= 5) {
+      nice = 5;
+    } else {
+      nice = 10;
+    }
+  
+    return nice * magnitude;
+  }
+  
+  function buildChartScale(maxValue, tickCount = 5) {
+    const safeMax = Math.max(Number(maxValue) || 0, 1);
+    const intervals = Math.max(1, tickCount - 1);
+    const step = niceChartStep(safeMax / intervals);
+    const axisMax = step * Math.ceil(safeMax / step);
+  
+    return {
+      axisMax,
+      ticks: Array.from({ length: tickCount }, (_, index) => step * index)
+    };
+  }
+  
+  function buildChartTickIndexes(rowCount, targetTicks = 6) {
+    const count = Number(rowCount) || 0;
+  
+    if (count <= 0) return [];
+    if (count === 1) return [0];
+  
+    const lastIndex = count - 1;
+    const steps = Math.min(targetTicks - 1, lastIndex);
+    const indexes = [];
+  
+    for (let i = 0; i <= steps; i++) {
+      indexes.push(Math.floor((i * lastIndex) / steps));
+    }
+  
+    if (indexes[indexes.length - 1] !== lastIndex) {
+      indexes.push(lastIndex);
+    }
+  
+    return [...new Set(indexes)];
   }
 
   function chartIrrText(value) {
@@ -919,7 +980,8 @@
       1
     );
   
-    const paddedMax = maxValue * 1.08;
+    const chartScale = buildChartScale(maxValue, 5);
+    const paddedMax = chartScale.axisMax;
   
     const x = (index) => {
       if (rows.length === 1) return margin.left;
@@ -963,11 +1025,10 @@
     const selectedSurrenderY = y(selectedRow.surrenderTotal);
     const selectedPremiumY = y(selectedRow.cumulativePremiumAfterDiscount);
   
-    const yTicks = [0, 0.25, 0.5, 0.75, 1]
-      .map((ratio) => {
-        const value = paddedMax * ratio;
+    const yTicks = chartScale.ticks
+      .map((value) => {
         const yy = y(value);
-  
+    
         return `
           <line
             class="gs-chart-grid-line"
@@ -976,7 +1037,7 @@
             x2="${width - margin.right}"
             y2="${yy}"
           ></line>
-  
+    
           <text
             class="gs-chart-y-label"
             x="${margin.left - 12}"
@@ -989,14 +1050,12 @@
       })
       .join("");
   
-    const labelStep = Math.max(1, Math.ceil(rows.length / 7));
-  
-    const xLabels = rows
-      .map((row, index) => {
-        if (index !== 0 && index !== rows.length - 1 && index % labelStep !== 0) {
-          return "";
-        }
-  
+    const const xTickIndexes = buildChartTickIndexes(rows.length, 6);
+
+    const xLabels = xTickIndexes
+      .map((index) => {
+        const row = rows[index];
+    
         return `
           <text
             class="gs-chart-x-label"
