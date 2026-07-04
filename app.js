@@ -1050,7 +1050,7 @@
       })
       .join("");
   
-    const const xTickIndexes = buildChartTickIndexes(rows.length, 6);
+    const xTickIndexes = buildChartTickIndexes(rows.length, 6);
 
     const xLabels = xTickIndexes
       .map((index) => {
