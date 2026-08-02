@@ -208,22 +208,32 @@
   // Discount logic
   // -----------------------------
 
-  function calculatePremiumDiscount(sumAssured, annualPremiumBeforeDiscount) {
+  function calculatePremiumDiscount(
+    sumAssured,
+    annualPremiumBeforeDiscount,
+    age
+  ) {
     const amount = toNumber(sumAssured);
     const premium = toNumber(annualPremiumBeforeDiscount);
+    const ageText = String(age ?? "").trim();
+    const insuredAge = toNumber(ageText, NaN);
+    const isAgeWithoutDiscount =
+      ageText !== "" && Number.isFinite(insuredAge) && insuredAge >= 66;
   
     let discountRate = 0;
     let discountLabel = "ไม่มีส่วนลดเบี้ย";
   
     if (typeof getPremiumDiscountRate === "function") {
-      discountRate = getPremiumDiscountRate(amount);
-    } else {
+      discountRate = getPremiumDiscountRate(amount, age);
+    } else if (!isAgeWithoutDiscount) {
       if (amount >= 500000) discountRate = 0.01;
       else if (amount >= 100000) discountRate = 0.005;
     }
   
     if (typeof getPremiumDiscountLabel === "function") {
-      discountLabel = getPremiumDiscountLabel(amount);
+      discountLabel = getPremiumDiscountLabel(amount, age);
+    } else if (isAgeWithoutDiscount) {
+      discountLabel = "อายุ 66 ปีขึ้นไป ไม่มีส่วนลดเบี้ย";
     } else {
       if (discountRate === 0.01) {
         discountLabel = "ทุนประกัน 500,000 บาทขึ้นไป ลด 1% ของทุนประกัน";
@@ -905,7 +915,8 @@
 
     const discount = calculatePremiumDiscount(
       sumAssured,
-      annualPremiumBeforeDiscount
+      annualPremiumBeforeDiscount,
+      age
     );
 
     const coverageYears = toNumber(plan.coverageYears);
