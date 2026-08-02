@@ -133,6 +133,9 @@ const PLANS = {
 };
 
 // ส่วนลดเบี้ยตามทุนประกัน
+// อายุแรกเข้าตั้งแต่ 66 ปีขึ้นไป ไม่มีส่วนลดเบี้ย
+const PREMIUM_DISCOUNT_MAX_ENTRY_AGE = 65;
+
 const PREMIUM_DISCOUNTS = [
   {
     minSumAssured: 500000,
@@ -157,9 +160,27 @@ function getPlanList() {
   return Object.values(PLANS);
 }
 
+// helper ตรวจสิทธิ์ส่วนลดตามอายุแรกเข้า
+// ถ้าไม่ได้ส่งอายุมา ให้คงพฤติกรรมเดิมเพื่อรองรับ code เก่าที่ยังเรียก helper แบบเดิม
+function isPremiumDiscountEligibleAge(age) {
+  const ageText = String(age ?? "").trim();
+
+  if (ageText === "") return true;
+
+  const insuredAge = Number(ageText);
+
+  if (!Number.isFinite(insuredAge)) return true;
+
+  return insuredAge <= PREMIUM_DISCOUNT_MAX_ENTRY_AGE;
+}
+
 // helper สำหรับหา rate ส่วนลด
-function getPremiumDiscountRate(sumAssured) {
+function getPremiumDiscountRate(sumAssured, age) {
   const amount = Number(sumAssured) || 0;
+
+  if (!isPremiumDiscountEligibleAge(age)) {
+    return 0;
+  }
 
   const matched = PREMIUM_DISCOUNTS.find((tier) => {
     const aboveMin = amount >= tier.minSumAssured;
@@ -173,8 +194,12 @@ function getPremiumDiscountRate(sumAssured) {
 }
 
 // helper สำหรับข้อความส่วนลด
-function getPremiumDiscountLabel(sumAssured) {
+function getPremiumDiscountLabel(sumAssured, age) {
   const amount = Number(sumAssured) || 0;
+
+  if (!isPremiumDiscountEligibleAge(age)) {
+    return "อายุ 66 ปีขึ้นไป ไม่มีส่วนลดเบี้ย";
+  }
 
   const matched = PREMIUM_DISCOUNTS.find((tier) => {
     const aboveMin = amount >= tier.minSumAssured;
