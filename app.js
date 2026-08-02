@@ -167,9 +167,21 @@
       : Number(plan.basePremiumRate) || 1;
   }
   
-  function getDiscountTiersForPremiumInput(plan) {
+  function getDiscountTiersForPremiumInput(plan, age) {
     const minSumAssured = getMinimumSumAssured(plan);
     const maxSumAssured = Number(plan?.maxSumAssured) || Infinity;
+    const insuredAge = Number(age);
+  
+    // อายุแรกเข้าตั้งแต่ 66 ปีขึ้นไป ไม่มีส่วนลดทุกช่วงทุนประกัน
+    if (Number.isFinite(insuredAge) && insuredAge >= 66) {
+      return [
+        {
+          min: minSumAssured,
+          max: maxSumAssured,
+          discountRate: 0
+        }
+      ];
+    }
   
     return [
       {
@@ -190,7 +202,11 @@
     ].filter((tier) => tier.min <= tier.max);
   }
   
-  function calculateSumAssuredFromFinalPremium(plan, annualPremiumAfterDiscount) {
+  function calculateSumAssuredFromFinalPremium(
+    plan,
+    annualPremiumAfterDiscount,
+    age
+  ) {
     const finalPremium = Number(annualPremiumAfterDiscount) || 0;
     const baseRate = getBasePremiumRate(plan);
   
@@ -198,7 +214,7 @@
   
     const candidates = [];
   
-    getDiscountTiersForPremiumInput(plan).forEach((tier) => {
+    getDiscountTiersForPremiumInput(plan, age).forEach((tier) => {
       const divisor = baseRate - tier.discountRate;
       if (divisor <= 0) return;
   
@@ -476,6 +492,7 @@
     const plan = getSelectedPlan();
     const rawValue = getInputValue("sum-assured");
     const sumAssured = Number(rawValue) || 0;
+    const age = getInputValue("age");
   
     if (!plan || !window.GSCalc) return;
   
@@ -491,7 +508,8 @@
   
     const discount = GSCalc.calculatePremiumDiscount(
       sumAssured,
-      premiumBeforeDiscount
+      premiumBeforeDiscount,
+      age
     );
   
     isSyncingPremiumFields = true;
@@ -518,6 +536,7 @@
     const plan = getSelectedPlan();
     const rawValue = getInputValue("annual-premium");
     const annualPremiumAfterDiscount = Number(rawValue) || 0;
+    const age = getInputValue("age");
   
     if (!plan || !window.GSCalc) return;
   
@@ -528,7 +547,8 @@
   
     const sumAssured = calculateSumAssuredFromFinalPremium(
       plan,
-      annualPremiumAfterDiscount
+      annualPremiumAfterDiscount,
+      age
     );
   
     const premiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
@@ -538,7 +558,8 @@
   
     const discount = GSCalc.calculatePremiumDiscount(
       sumAssured,
-      premiumBeforeDiscount
+      premiumBeforeDiscount,
+      age
     );
   
     isSyncingPremiumFields = true;
@@ -577,6 +598,7 @@
     if (!plan || !input || !window.GSCalc) return;
   
     const annualPremiumAfterDiscount = Number(input.value) || 0;
+    const age = getInputValue("age");
     if (annualPremiumAfterDiscount <= 0) return;
   
     const minSumAssured = getMinimumSumAssured(plan);
@@ -588,7 +610,8 @@
   
     const minDiscount = GSCalc.calculatePremiumDiscount(
       minSumAssured,
-      minPremiumBeforeDiscount
+      minPremiumBeforeDiscount,
+      age
     );
   
     const minPremiumAfterDiscount = minDiscount.premiumAfterDiscount;
@@ -610,7 +633,8 @@
   
     const sumAssured = calculateSumAssuredFromFinalPremium(
       plan,
-      annualPremiumAfterDiscount
+      annualPremiumAfterDiscount,
+      age
     );
   
     const premiumBeforeDiscount = GSCalc.calculateBaseAnnualPremium(
@@ -620,7 +644,8 @@
   
     const discount = GSCalc.calculatePremiumDiscount(
       sumAssured,
-      premiumBeforeDiscount
+      premiumBeforeDiscount,
+      age
     );
   
     isSyncingPremiumFields = true;
@@ -1581,6 +1606,14 @@
   
     $("annual-premium")?.addEventListener("input", updateSumAssuredFromPremium);
     $("annual-premium")?.addEventListener("blur", enforceMinimumPremium);
+  
+    // เปลี่ยนอายุแล้วคำนวณเบี้ยใหม่ทันที เพราะอายุ 66 ปีขึ้นไปไม่มีส่วนลด
+    $("age")?.addEventListener("input", updateAutoPremium);
+    $("age")?.addEventListener("change", () => {
+      if (currentQuote) {
+        $("quote-form")?.requestSubmit();
+      }
+    });
   
     $("plan-id")?.addEventListener("change", applyPlanDefaults);
   
