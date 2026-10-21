@@ -143,6 +143,7 @@
                 <select id="plan-id" name="planId" required class="native-select-hidden">
                   <option value="GS_15_8">Global Saving Plus 15/8</option>
                   <option value="GS_25_5">Global Saving Plus 25/5</option>
+                  <option value="GS_MIX">Global Saving Plus Mix</option>
                 </select>
               
                 <div class="choice-grid plan-choice-grid" role="radiogroup" aria-label="เลือกแผน">
@@ -172,6 +173,12 @@
                       <strong>Global Saving Plus 25/5</strong>
                       <small>ชำระสั้น 5 ปี - เงินเติบโตมั่นคง</small>
                     </span>
+                  </button>
+                  <button type="button" class="choice-card plan-card plan-mix"
+                    data-target="plan-id" data-value="GS_MIX" aria-pressed="false">
+                    <span class="choice-icon">🔀</span>
+                    <span class="choice-text"><strong>Global Saving Plus Mix</strong>
+                      <small>15/8 + 25/5 • เลือกเบี้ยสองแผนแยกกัน</small></span>
                   </button>
                 </div>
               </div>
@@ -295,7 +302,7 @@
                 </select>
               </div>
   
-              <div class="field">
+              <div class="field" id="single-sum-assured-field">
                 <div class="field-label-row">
                   <label for="sum-assured">ทุนประกัน</label>
               
@@ -326,7 +333,7 @@
                 />
               </div>
   
-              <div class="field">
+              <div class="field" id="single-premium-field">
                 <label for="annual-premium">เบี้ยประกันภัยต่อปี</label>
                 <input
                   id="annual-premium"
@@ -339,6 +346,16 @@
                 />
               </div>
   
+              <div class="field field-full" id="mix-premium-fields" hidden>
+                <label>เบี้ยประกันภัยรายปีหลังส่วนลด (แต่ละกรมธรรม์)</label>
+                <div class="mix-premium-grid">
+                  <div><label for="mix-premium-15">Global Saving Plus 15/8 (จ่าย 8 ปี)</label>
+                    <input id="mix-premium-15" type="number" step="0.01" min="0" value="50000"></div>
+                  <div><label for="mix-premium-25">Global Saving Plus 25/5 (จ่าย 5 ปี)</label>
+                    <input id="mix-premium-25" type="number" step="0.01" min="0" value="50000"></div>
+                </div>
+                <p class="muted">ปี 1–5 จ่ายทั้งสองแผน • ปี 6–8 จ่ายเฉพาะ 15/8 • ปี 15 รับเงินครบสัญญา 15/8 • ปี 25 รับเงินครบสัญญา 25/5</p>
+              </div>
               <div class="field">
                 <label for="assumed-index-return">ผลตอบแทนดัชนีคาดหวังเฉลี่ยต่อปี (%)</label>
                 <input
@@ -492,7 +509,7 @@
             </div>
   
             <div class="summary-card highlight">
-              <span>เบี้ยหลังส่วนลด / ปี</span>
+              <span id="summary-premium-label">เบี้ยหลังส่วนลด / ปี</span>
               <strong id="summary-premium-after">-</strong>
             </div>
   
@@ -571,6 +588,7 @@
           </div>
         
           <div class="hero-accent-line"></div>
+          <p id="mix-report-note" class="muted" hidden></p>
         
           <div class="plan-metric-grid">
             <div class="plan-metric major">
@@ -579,7 +597,7 @@
             </div>
         
             <div class="plan-metric major">
-              <span>เบี้ยที่ชำระจริง / ปี</span>
+              <span id="report-premium-label">เบี้ยที่ชำระจริง / ปี</span>
               <strong id="report-premium-after">-</strong>
             </div>
         
