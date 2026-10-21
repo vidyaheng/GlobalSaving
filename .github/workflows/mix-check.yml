@@ -1,0 +1,29 @@
+name: GlobalSaving Mix Checks
+on:
+  push:
+    branches:
+      - feature/global-saving-mix-20261021
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.html'
+      - '**.css'
+      - '.github/workflows/mix-check.yml'
+  workflow_dispatch:
+jobs:
+  mix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          node --check plans.js
+          node --check calc.js
+          node --check app.js
+          node --check sw.js
+          node --check test_mix.js
+      - name: Mix calculation tests
+        run: node test_mix.js

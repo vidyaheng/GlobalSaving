@@ -64,6 +64,17 @@ const PLANS = {
     }
   },
 
+  GS_MIX: {
+    id: "GS_MIX", productName: "Global Saving Plus",
+    planName: "Global Saving Plus Mix 15/8 + 25/5",
+    displayName: "Global Saving Plus Mix", code: "E15G8A + E25G5A",
+    isCombination: true, coverageYears: 25, premiumPayYears: 8,
+    currency: "THB", paymentMode: "รายปี",
+    description: "ซื้อสองกรมธรรม์พร้อมกัน จ่ายเบี้ย 15/8 แปดปี และ 25/5 ห้าปี",
+    defaultInput: {gender:"male", age:30, assumedIndexReturn:5, taxRate:0,
+      payoutOption:"withdraw", mixPremium15:50000, mixPremium25:50000}
+  },
+
   GS_25_5: {
     id: "GS_25_5",
     productName: "Global Saving Plus",

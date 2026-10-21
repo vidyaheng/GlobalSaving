@@ -3003,3 +3003,12 @@ tbody tr:last-child td {
     grid-template-columns: 1fr;
   }
 }
+
+/* Global Saving Mix */
+.mix-premium-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:8px 0 12px}
+.mix-premium-grid label {font-size:.85rem}
+.plan-choice-grid {grid-template-columns:repeat(3,minmax(0,1fr))}
+.plan-card.plan-mix.is-active {border-color:#7c3aed;background:#f5f3ff}
+.plan-card.plan-mix .choice-icon {color:#7c3aed;background:#f5f3ff}
+@media(max-width:900px) {.plan-choice-grid {grid-template-columns:1fr}}
+@media(max-width:640px) {.mix-premium-grid {grid-template-columns:1fr}}

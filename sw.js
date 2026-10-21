@@ -1,4 +1,4 @@
-const CACHE_NAME = "globalsaving-plus-pwa-v4";
+const CACHE_NAME = "globalsaving-plus-pwa-v5-mix";
 
 const APP_SHELL = [
   "./",
