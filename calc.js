@@ -747,7 +747,9 @@
       const taxSaving =
         taxMode === "include" ? Number(row.taxSaving) || 0 : 0;
   
-      if (payoutOption === "accumulate") {
+      if (Number.isFinite(row.mixCashInflow)) {
+        inflow = row.mixCashInflow;
+      } else if (payoutOption === "accumulate") {
         // ฝากสะสม: ไม่รับเงินระหว่างทาง รับยอดสะสมทั้งหมดตอนครบสัญญา
         if (index === finalIndex) {
           const finalCashback =
@@ -807,24 +809,29 @@
         inflow += Number(row.taxSaving) || 0;
       }
   
-      // ถ้าเลือกรับเงินคืนออก รับเงินคืน/ดัชนีในปีก่อนหน้า
-      // แต่ปีที่เวนคืน ไม่เอา livingBenefit ปีนั้นมาซ้ำ
-      if (payoutOption === "withdraw" && i < index) {
-        inflow += Number(row.livingBenefit) || 0;
-        inflow += Number(row.projectedIndexBenefit) || 0;
-      }
-  
-      // ปีที่เลือก = เวนคืน
-      if (i === index) {
-        if (payoutOption === "accumulate") {
-          const taxPart = includeTax ? Number(row.cumulativeTaxSaving) || 0 : 0;
-          inflow += Math.max(0, (Number(row.surrenderTotal) || 0) - taxPart);
-        } else {
-          inflow += Number(row.surrenderGuaranteed) || 0;
-          inflow += Number(row.surrenderIndexBenefit) || 0;
+      if (Number.isFinite(row.mixCashInflow)) {
+        if (i < index) inflow += row.mixCashInflow;
+        else inflow += (Number(row.mixMaturityCashInflow)||0)+(Number(row.mixTerminalSurrender)||0);
+      } else {
+        // ถ้าเลือกรับเงินคืนออก รับเงินคืน/ดัชนีในปีก่อนหน้า
+        // แต่ปีที่เวนคืน ไม่เอา livingBenefit ปีนั้นมาซ้ำ
+        if (payoutOption === "withdraw" && i < index) {
+          inflow += Number(row.livingBenefit) || 0;
+          inflow += Number(row.projectedIndexBenefit) || 0;
         }
+    
+        // ปีที่เลือก = เวนคืน
+        if (i === index) {
+          if (payoutOption === "accumulate") {
+            const taxPart = includeTax ? Number(row.cumulativeTaxSaving) || 0 : 0;
+            inflow += Math.max(0, (Number(row.surrenderTotal) || 0) - taxPart);
+          } else {
+            inflow += Number(row.surrenderGuaranteed) || 0;
+            inflow += Number(row.surrenderIndexBenefit) || 0;
+          }
+        }
+    
       }
-  
       cashflows.push(roundMoney(inflow - nextPremium));
     }
   
@@ -859,21 +866,26 @@
         inflow += Number(row.taxSaving) || 0;
       }
   
-      if (payoutOption === "withdraw" && i < index) {
-        inflow += Number(row.livingBenefit) || 0;
-        inflow += Number(row.projectedIndexBenefit) || 0;
-      }
-  
-      if (i === index) {
-        if (payoutOption === "accumulate") {
-          const taxPart = includeTax ? Number(row.cumulativeTaxSaving) || 0 : 0;
-          inflow += Math.max(0, (Number(row.deathTotal) || 0) - taxPart);
-        } else {
-          inflow += Number(row.deathGuaranteed) || 0;
-          inflow += Number(row.deathIndexBenefit) || 0;
+      if (Number.isFinite(row.mixCashInflow)) {
+        if (i < index) inflow += row.mixCashInflow;
+        else inflow += (Number(row.mixMaturityCashInflow)||0)+(Number(row.mixTerminalDeath)||0);
+      } else {
+        if (payoutOption === "withdraw" && i < index) {
+          inflow += Number(row.livingBenefit) || 0;
+          inflow += Number(row.projectedIndexBenefit) || 0;
         }
+    
+        if (i === index) {
+          if (payoutOption === "accumulate") {
+            const taxPart = includeTax ? Number(row.cumulativeTaxSaving) || 0 : 0;
+            inflow += Math.max(0, (Number(row.deathTotal) || 0) - taxPart);
+          } else {
+            inflow += Number(row.deathGuaranteed) || 0;
+            inflow += Number(row.deathIndexBenefit) || 0;
+          }
+        }
+    
       }
-  
       cashflows.push(roundMoney(inflow - nextPremium));
     }
   
@@ -884,7 +896,143 @@
   // Main quote calculation
   // -----------------------------
 
+  // Mix consists of two independent policies, preserving their original rates.
+  function mixSumAssuredForPremium(plan, premium, age) {
+    const rate = Number(plan.basePremiumRate) || 1;
+    const min = Number(plan.minSumAssured) || 20000;
+    const tiers = Number(age) >= 66 ?
+      [{low:min,high:Infinity,discount:0}] :
+      [{low:min,high:99999.999999,discount:0},
+       {low:Math.max(min,100000),high:499999.999999,discount:0.005},
+       {low:Math.max(min,500000),high:Infinity,discount:0.01}];
+    const candidates = tiers.map(t=>premium/(rate-t.discount))
+      .filter((v,i)=>Number.isFinite(v) && v>=tiers[i].low-0.000001 && v<=tiers[i].high+0.000001);
+    return candidates.length ? Math.max(...candidates) : null;
+  }
+
+  function calculateMixQuote(input) {
+    const age = Number(input.age), ageRaw=String(input.age??"").trim();
+    const premiums=[Number(input.mixPremium15),Number(input.mixPremium25)];
+    const errors=[];
+    if(!ageRaw || !Number.isFinite(age) || age<0 || age>75)
+      errors.push("อายุรับประกันต้องอยู่ระหว่าง 1 เดือน ถึง 75 ปี");
+    premiums.forEach((v,i)=>{
+      if (!Number.isFinite(v) || v<=0 || String(i===0?input.mixPremium15:input.mixPremium25).trim()==="")
+        errors.push("กรุณากรอกเบี้ยของ "+(i===0?"15/8":"25/5")+" ให้ถูกต้อง");
+    });
+    if(errors.length)return {ok:false,errors};
+    const plan15=getSafePlan("GS_15_8"),plan25=getSafePlan("GS_25_5");
+    const plans=[plan15,plan25];
+    const quotes=plans.map((plan,i)=>{
+      const assured=mixSumAssuredForPremium(plan,premiums[i],age);
+      if(assured===null){errors.push("เบี้ยของ "+plan.displayName+" ไม่สอดคล้องกับช่วงทุนขั้นต่ำ/ส่วนลด");return null;}
+      const net=calculatePremiumDiscount(assured,calculateBaseAnnualPremium(plan,assured),age).premiumAfterDiscount;
+      if(Math.abs(net-premiums[i])>0.02){errors.push("เบี้ยของ "+plan.displayName+" ไม่ตรงกับทุนประกันที่คำนวณได้");return null;}
+      return calculateQuote({...input,planId:plan.id,sumAssured:assured,taxMode:"none"});
+    });
+    if(errors.length)return {ok:false,errors};
+    if(quotes.some(q=>!q?.ok))return {ok:false,errors:quotes.flatMap(q=>q?.errors||[])};
+    const [q15,q25]=quotes, a=q15.yearlyTable,b=q25.yearlyTable;
+    const mode=input.payoutOption==="accumulate"?"accumulate":"withdraw";
+    const taxMode=input.taxMode==="include"?"include":"none";
+    const taxRate=taxMode==="include"?Math.max(0,Number(input.taxRate)||0):0;
+    const usedTaxAllowance=taxMode==="include"?Math.max(0,Number(input.usedTaxAllowance)||0):0;
+    const remainingTaxAllowance=Math.max(0,100000-usedTaxAllowance);
+    const fields=["premiumBeforeDiscount","discountAmount","premiumAfterDiscount",
+      "cumulativePremiumBeforeDiscount","cumulativeDiscount","cumulativePremiumAfterDiscount",
+      "annualCashback","cumulativeCashback","cumulativeReceivedCashback","livingBenefit",
+      "accumulatedLivingBenefit","carriedCashbackValue","carriedIndexValue",
+      "projectedIndexBenefit","cumulativeIndexBenefit","guaranteedMaturityBenefit",
+      "deathGuaranteed","deathIndexBenefit","surrenderGuaranteed","surrenderIndexBenefit"];
+    const cumulative=new Set(["cumulativePremiumBeforeDiscount","cumulativeDiscount",
+      "cumulativePremiumAfterDiscount","cumulativeCashback","cumulativeReceivedCashback",
+      "cumulativeIndexBenefit"]);
+    const paidAtMaturity=q=> {
+      const r=q.yearlyTable[q.yearlyTable.length-1];
+      return roundMoney((Number(r.carriedCashbackValue)||0)+(Number(r.carriedIndexValue)||0));
+    };
+    const paid15=paidAtMaturity(q15),paid25=paidAtMaturity(q25);
+    const historical15=mode==="accumulate"?paid15:
+      roundMoney(q15.summary.totalCashback+q15.summary.totalProjectedIndexBenefit);
+    let taxCumulative=0;
+    const rows=[];
+    for(let year=1;year<=25;year++){
+      const p15=year<=15?a[year-1]:null,p25=b[year-1];
+      const row={policyYear:year,age:age+year-1};
+      fields.forEach(key=>{
+        const v15=p15?Number(p15[key])||0:(cumulative.has(key)?Number(a[14][key])||0:0);
+        row[key]=roundMoney(v15+(Number(p25[key])||0));
+      });
+      const taxDeductiblePremium=taxMode==="include"?Math.min(row.premiumAfterDiscount,remainingTaxAllowance):0;
+      const taxSaving=roundMoney(taxDeductiblePremium*taxRate/100);
+      taxCumulative=roundMoney(taxCumulative+taxSaving);
+      Object.assign(row,{taxMode,shouldIncludeTax:taxMode==="include",taxAllowanceCap:100000,
+        usedTaxAllowance,remainingTaxAllowance,taxDeductiblePremium,taxSaving,
+        cumulativeTaxSaving:taxCumulative,payoutOption:mode,
+        shouldAccumulatePayouts:mode==="accumulate",indexPayoutRate:null});
+      const flow15=p15?(mode==="accumulate"?(year===15?paid15:0):
+        (Number(p15.livingBenefit)||0)+(Number(p15.projectedIndexBenefit)||0)):0;
+      const flow25=mode==="accumulate"?(year===25?paid25:0):
+        (Number(p25.livingBenefit)||0)+(Number(p25.projectedIndexBenefit)||0);
+      row.mixCashInflow=roundMoney(flow15+flow25);
+      row.mixMaturityCashInflow=year===15?flow15:0;
+      const terminal=(r,kind)=>r?(mode==="accumulate"?(Number(r[kind+"Total"])||0):
+        (Number(r[kind+"Guaranteed"])||0)+(Number(r[kind+"IndexBenefit"])||0)):0;
+      // Only active policies may be surrendered or pay death benefit.
+      row.mixTerminalSurrender=roundMoney(terminal(year<15?p15:null,"surrender")+terminal(p25,"surrender"));
+      row.mixTerminalDeath=roundMoney(terminal(year<15?p15:null,"death")+terminal(p25,"death"));
+      if(year>=15){
+        ["deathGuaranteed","deathIndexBenefit","surrenderGuaranteed","surrenderIndexBenefit"].forEach(k=>row[k]=Number(p25[k])||0);
+      }
+      row.deathTotal=roundMoney((year<15?(Number(p15.deathTotal)||0):historical15)+
+        (Number(p25.deathTotal)||0)+taxCumulative);
+      row.surrenderTotal=roundMoney((year<15?(Number(p15.surrenderTotal)||0):historical15)+
+        (Number(p25.surrenderTotal)||0)+taxCumulative);
+      row.totalBenefitThisYear=roundMoney(row.livingBenefit+row.projectedIndexBenefit+taxSaving);
+      rows.push(row);
+    }
+    const addSummary=k=>roundMoney((Number(q15.summary[k])||0)+(Number(q25.summary[k])||0));
+    const irrCashflows=buildIrrCashflows({yearlyTable:rows,payoutOption:mode,taxMode});
+    const totalCashback=addSummary("totalCashback");
+    const totalProjectedIndexBenefit=addSummary("totalProjectedIndexBenefit");
+    const policyProjectedTotalBenefit=mode==="accumulate"?roundMoney(paid15+paid25):
+      roundMoney(totalCashback+totalProjectedIndexBenefit);
+    const totalTaxSaving=taxMode==="include"?taxCumulative:0;
+    const plan=getSafePlan("GS_MIX");
+    const summary={
+      planId:plan.id,productName:plan.productName,planName:plan.planName,
+      displayName:plan.displayName,code:plan.code,
+      gender:input.gender||"male",age,sumAssured:addSummary("sumAssured"),
+      coverageYears:25,premiumPayYears:8,paymentMode:"รายปี",
+      annualPremiumBeforeDiscount:addSummary("annualPremiumBeforeDiscount"),
+      annualPremiumAfterDiscount:addSummary("annualPremiumAfterDiscount"),
+      annualDiscountAmount:addSummary("annualDiscountAmount"),
+      discountRate:null,discountLabel:"คำนวณส่วนลดแยกตามทุนของแต่ละกรมธรรม์",
+      totalPremiumBeforeDiscount:addSummary("totalPremiumBeforeDiscount"),
+      totalPremiumAfterDiscount:addSummary("totalPremiumAfterDiscount"),
+      totalDiscount:addSummary("totalDiscount"),
+      assumedIndexReturn:Number(input.assumedIndexReturn)||0,
+      taxMode,taxRate,taxAllowanceCap:100000,usedTaxAllowance,remainingTaxAllowance,
+      annualTaxDeductiblePremium:rows[0].taxDeductiblePremium,annualTaxSaving:rows[0].taxSaving,totalTaxSaving,
+      payoutOption:mode,payoutOptionLabel:mode==="accumulate"?
+        "ฝากสะสม 0.5% (รับยอดปี 15 และ 25)":"รับเงินออกเมื่อถึงกำหนด",
+      totalCashback,totalProjectedIndexBenefit,
+      accumulatedLivingBenefit:addSummary("accumulatedLivingBenefit"),
+      guaranteedMaturityBenefit:addSummary("guaranteedMaturityBenefit"),
+      policyProjectedTotalBenefit,projectedTotalBenefit:roundMoney(policyProjectedTotalBenefit+totalTaxSaving),
+      irrCashflows,irrAtMaturity:calculateIrr(irrCashflows),
+      componentPremium15:q15.summary.annualPremiumAfterDiscount,
+      componentPremium25:q25.summary.annualPremiumAfterDiscount,
+      componentSumAssured15:q15.summary.sumAssured,
+      componentSumAssured25:q25.summary.sumAssured,
+      componentMaturityPayout15:paid15,componentMaturityPayout25:paid25
+    };
+    return {ok:true,input,plan,summary,yearlyTable:rows,components:quotes};
+  }
+
+
   function calculateQuote(input) {
+    if(input?.planId==="GS_MIX")return calculateMixQuote(input);
     const plan = getSafePlan(input.planId);
 
     const validation = validateQuoteInput(input);
