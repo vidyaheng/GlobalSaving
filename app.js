@@ -283,6 +283,7 @@
     if (summary.planId === "GS_25_5") {
       return "Global Saving Plus 25/5 (Index-Linked)";
     }
+    if (summary.planId === "GS_MIX") return "Global Saving Plus Mix (15/8 + 25/5)";
   
     return summary.displayName || summary.planName || "Global Saving Plus";
   }
@@ -295,6 +296,7 @@
     if (summary.planId === "GS_25_5") {
       return "โกลบอล เซฟวิ่งส์ พลัส 25/5 (อินเด็กซ์ ลิงค์)";
     }
+    if (summary.planId === "GS_MIX") return "โกลบอล เซฟวิ่งส์ พลัส Mix 15/8 + 25/5";
   
     return "โกลบอล เซฟวิ่งส์ พลัส";
   }
@@ -437,6 +439,24 @@
     }
   }
 
+  function isMixPlan() { return getInputValue("plan-id") === "GS_MIX"; }
+
+  function syncMixVisibility() {
+    const mix=isMixPlan();
+    ["mix-premium-fields"].forEach(id=>{const e=$(id);if(e)e.hidden=!mix;});
+    ["single-sum-assured-field","single-premium-field"].forEach(id=>{const e=$(id);if(e)e.hidden=mix;});
+    const premium=$("annual-premium"),assured=$("sum-assured");
+    if(premium)premium.required=!mix;
+    if(assured)assured.required=!mix;
+    document.querySelectorAll('.choice-card[data-target="plan-id"]').forEach(card=>{
+      const selected=card.dataset.value===getInputValue("plan-id");
+      card.classList.toggle("is-active",selected);
+      card.setAttribute("aria-pressed",selected?"true":"false");
+    });
+    setText("summary-premium-label",mix?"เบี้ยรวมปี 1–5":"เบี้ยหลังส่วนลด / ปี");
+    setText("report-premium-label",mix?"เบี้ยรวมปี 1–5":"เบี้ยที่ชำระจริง / ปี");
+  }
+
   function applyPlanDefaults() {
     const planId = getInputValue("plan-id");
   
@@ -446,6 +466,19 @@
     if (!plan) return;
   
     localStorage.setItem(LAST_PLAN_KEY, planId);
+    syncMixVisibility();
+    if(plan.isCombination) {
+      setInputValue("mix-premium-15",plan.defaultInput?.mixPremium15 ?? 50000);
+      setInputValue("mix-premium-25",plan.defaultInput?.mixPremium25 ?? 50000);
+      if(plan.defaultInput) {
+        setInputValue("age",plan.defaultInput.age ?? 30);
+        setInputValue("gender",plan.defaultInput.gender ?? "male");
+        setInputValue("assumed-index-return",plan.defaultInput.assumedIndexReturn ?? 5);
+        setInputValue("payout-option",plan.defaultInput.payoutOption ?? "withdraw");
+        setInputValue("tax-rate",plan.defaultInput.taxRate ?? 0);
+      }
+      return;
+    }
   
     if (plan.defaultInput) {
       if (plan.defaultInput.gender) {
@@ -487,6 +520,7 @@
   }
 
   function updateAutoPremium() {
+    if (isMixPlan()) return;
     if (isSyncingPremiumFields) return;
   
     const plan = getSelectedPlan();
@@ -531,6 +565,7 @@
   }
 
   function updateSumAssuredFromPremium() {
+    if (isMixPlan()) return;
     if (isSyncingPremiumFields) return;
   
     const plan = getSelectedPlan();
@@ -767,6 +802,8 @@
       age: getInputValue("age"),
       sumAssured: getInputValue("sum-assured"),
       annualPremium: getInputValue("annual-premium"),
+      mixPremium15: getInputValue("mix-premium-15"),
+      mixPremium25: getInputValue("mix-premium-25"),
       assumedIndexReturn: getInputValue("assumed-index-return"),
       payoutOption: getInputValue("payout-option"),
   
@@ -1340,7 +1377,9 @@
 
     setText("summary-plan", s.displayName || s.planName || "-");
     setText("summary-sum-assured", money(s.sumAssured));
-    setText("summary-discount", `${percent(s.discountRate)} / ${money(s.annualDiscountAmount)}`);
+    setText("summary-discount",s.planId==="GS_MIX"?
+      `รวม ${money(s.annualDiscountAmount)} (คิดแยกสองกรมธรรม์)`:
+      `${percent(s.discountRate)} / ${money(s.annualDiscountAmount)}`);
     setText("summary-premium-after", money(s.annualPremiumAfterDiscount));
     setText("summary-total-premium", money(s.totalPremiumAfterDiscount));
     setText("summary-total-benefit", money(s.projectedTotalBenefit));
@@ -1352,10 +1391,9 @@
 
     setText("report-title", planTitleEn(s));
     setText("report-title-th", planTitleTh(s));
-    setText(
-      "report-subtitle",
-      `ทุนประกัน ${money(s.sumAssured)} | ชำระเบี้ย ${s.premiumPayYears} ปี | คุ้มครอง ${s.coverageYears} ปี`
-    );
+    setText("report-subtitle",s.planId==="GS_MIX"?
+      `ทุนประกันรวม ${money(s.sumAssured)} | จ่ายสองกรมธรรม์ปี 1–5 และเฉพาะ 15/8 ปี 6–8 | แสดงผล 25 ปี`:
+      `ทุนประกัน ${money(s.sumAssured)} | ชำระเบี้ย ${s.premiumPayYears} ปี | คุ้มครอง ${s.coverageYears} ปี`);
 
     setText("report-date", meta.createdDateText || todayText());
     setText("report-advisor", meta.advisorName || "-");
@@ -1369,7 +1407,7 @@
     setText("report-pay-years", `${s.premiumPayYears} ปี`);
 
     setText("report-premium-before", money(s.annualPremiumBeforeDiscount));
-    setText("report-discount-rate", percent(s.discountRate));
+    setText("report-discount-rate", s.planId==="GS_MIX"?"แยกสองแผน":percent(s.discountRate));
     setText("report-discount-amount", money(s.annualDiscountAmount));
     setText("report-premium-after", money(s.annualPremiumAfterDiscount));
     setText("report-total-before", money(s.totalPremiumBeforeDiscount));
@@ -1380,6 +1418,12 @@
     setText("report-index-benefit", money(s.totalProjectedIndexBenefit));
     setText("report-total-benefit", money(s.projectedTotalBenefit));
     setText("report-irr", irrText(s.irrAtMaturity));
+    const mixNote=$("mix-report-note");
+    if(mixNote){
+      mixNote.hidden=s.planId!=="GS_MIX";
+      mixNote.textContent=s.planId==="GS_MIX"?
+        `Mix = 2 กรมธรรม์ • เบี้ย 15/8: ${money(s.componentPremium15)}/ปี (8 ปี) • เบี้ย 25/5: ${money(s.componentPremium25)}/ปี (5 ปี) • รับเงินครบสัญญาแผนแรกในปี 15 และแผนที่สองในปี 25`:"";
+    }
   }
 
   function renderPayoutOptionLabels(quote) {
@@ -1506,6 +1550,7 @@
     if (form) form.reset();
 
     applyPlanDefaults();
+    syncMixVisibility();
 
     applyAdvisorNameFromPin({ force: true });
 
@@ -1606,6 +1651,9 @@
   
     $("annual-premium")?.addEventListener("input", updateSumAssuredFromPremium);
     $("annual-premium")?.addEventListener("blur", enforceMinimumPremium);
+    ["mix-premium-15","mix-premium-25"].forEach(id=>{
+      $(id)?.addEventListener("change",()=>{if(currentQuote)$("quote-form")?.requestSubmit();});
+    });
   
     // เปลี่ยนอายุแล้วคำนวณเบี้ยใหม่ทันที เพราะอายุ 66 ปีขึ้นไปไม่มีส่วนลด
     $("age")?.addEventListener("input", updateAutoPremium);
@@ -1655,6 +1703,7 @@
   function init() {
     populatePlanSelect();
     applyPlanDefaults();
+    syncMixVisibility();
     syncTaxFieldsVisibility();
     bindEvents();
     renderAuthState();
