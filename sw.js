@@ -1,4 +1,4 @@
-const CACHE_NAME = "globalsaving-plus-pwa-v5-mix";
+const CACHE_NAME = "globalsaving-plus-pwa-v6-mix-cachefix";
 
 const APP_SHELL = [
   "./",
@@ -64,6 +64,23 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // Code assets must be network-first: HTML and JS from different releases
+  // must not be combined (particularly in in-app browsers and existing PWAs).
+  if (/\\.(?:js|css)$/.test(requestUrl.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }
